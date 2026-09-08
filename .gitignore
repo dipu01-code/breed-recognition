@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+.DS_Store
+
+datasets/raw/
+datasets/processed/
+models/checkpoints/
+models/*.onnx
+models/*.tflite
