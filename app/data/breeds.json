@@ -1,0 +1,538 @@
+[
+    {
+        "breed_name": "Gir",
+        "animal_type": "cattle",
+        "origin_state": "Gujarat",
+        "origin_region": "Saurashtra and the Gir forest region",
+        "purpose": [
+            "dairy",
+            "draft"
+        ],
+        "physical_characteristics": "Medium to large zebu cattle with a distinctive convex forehead and pendulous ears.",
+        "color": "Red to white, commonly red with white patches or speckles.",
+        "horn_characteristics": "Thick horns curve outward and backward, then turn upward.",
+        "body_characteristics": "Deep, well-developed barrel and a loose skin typical of zebu cattle.",
+        "dairy_characteristics": "Recognized as an important Indian dairy breed; yield varies substantially with management and line.",
+        "aliases": [
+            "Gyr",
+            "Gir cattle"
+        ],
+        "identification_notes": "The convex forehead, long pendulous ears, and red-speckled coat are useful clues, but photographs alone may not separate Gir from related zebu cattle.",
+        "confidence": "high",
+        "uncertainties": [
+            "Individual color and horn shape vary."
+        ]
+    },
+    {
+        "breed_name": "Sahiwal",
+        "animal_type": "cattle",
+        "origin_state": "Punjab",
+        "origin_region": "Sahiwal area of the former Punjab region",
+        "purpose": [
+            "dairy"
+        ],
+        "physical_characteristics": "Well-proportioned, heat-tolerant zebu cattle with a loose dewlap and skin.",
+        "color": "Reddish brown to red, sometimes with lighter shading.",
+        "horn_characteristics": "Short, thick horns with a slight outward and upward curve.",
+        "body_characteristics": "Broad body, developed hindquarters, and a prominent zebu hump.",
+        "dairy_characteristics": "A recognized Indian and South Asian dairy breed with relatively long lactations compared with many indigenous breeds.",
+        "aliases": [
+            "Montgomery",
+            "Sahiwal cattle"
+        ],
+        "identification_notes": "Use the red coat, loose skin, short horns, and heavy dairy build together; coat shade alone is not diagnostic.",
+        "confidence": "high",
+        "uncertainties": [
+            "The historical origin region crosses the present India-Pakistan border."
+        ]
+    },
+    {
+        "breed_name": "Red Sindhi",
+        "animal_type": "cattle",
+        "origin_state": "Sindh (historical region)",
+        "origin_region": "Lower and central Sindh region",
+        "purpose": [
+            "dairy",
+            "draft"
+        ],
+        "physical_characteristics": "Compact, hardy zebu cattle with a moderate hump and loose skin.",
+        "color": "Deep red to reddish brown, with darker shading in some animals.",
+        "horn_characteristics": "Small to medium horns that curve upward and backward.",
+        "body_characteristics": "Compact frame with a comparatively deep barrel and well-developed udder in milking females.",
+        "dairy_characteristics": "Known as a heat-tolerant dairy breed; production depends on feeding and management.",
+        "aliases": [
+            "Sindhi",
+            "Red Karachi",
+            "Red Sindhi cattle"
+        ],
+        "identification_notes": "The uniform red coat helps distinguish it from many spotted breeds, but identification should include body and horn traits.",
+        "confidence": "high",
+        "uncertainties": [
+            "The breed's historical origin is outside present-day India; state labels are therefore historical rather than current administrative origins."
+        ]
+    },
+    {
+        "breed_name": "Rathi",
+        "animal_type": "cattle",
+        "origin_state": "Rajasthan",
+        "origin_region": "Northwestern Rajasthan, especially the Bikaner area",
+        "purpose": [
+            "dairy",
+            "draft"
+        ],
+        "physical_characteristics": "Medium-sized zebu cattle with a developed udder in cows and a moderate hump.",
+        "color": "Usually brown with white patches, ranging from mostly brown to mostly white.",
+        "horn_characteristics": "Short to medium horns with a lateral or upward curve.",
+        "body_characteristics": "Moderate frame suited to arid conditions.",
+        "dairy_characteristics": "A regional dairy and dual-purpose breed; individual yield is variable.",
+        "aliases": [
+            "Rathi cattle"
+        ],
+        "identification_notes": "Coat pattern is variable; combine it with the northwestern Rajasthan provenance and medium zebu build.",
+        "confidence": "medium",
+        "uncertainties": [
+            "Color descriptions and exact distribution vary among references."
+        ]
+    },
+    {
+        "breed_name": "Tharparkar",
+        "animal_type": "cattle",
+        "origin_state": "Rajasthan",
+        "origin_region": "Thar Desert and adjoining arid tract",
+        "purpose": [
+            "dairy",
+            "draft"
+        ],
+        "physical_characteristics": "Medium to large, hardy zebu cattle adapted to hot and dry conditions.",
+        "color": "White to light grey, often with darker shading around the neck, hump, and quarters.",
+        "horn_characteristics": "Medium horns curve outward and upward.",
+        "body_characteristics": "Strong frame, prominent hump, and sturdy legs.",
+        "dairy_characteristics": "A recognized dual-purpose breed with useful milk production under arid conditions.",
+        "aliases": [
+            "White Sindhi",
+            "Thari"
+        ],
+        "identification_notes": "Light grey coat with darker extremities is a useful clue, but age and sex affect apparent shade.",
+        "confidence": "high",
+        "uncertainties": [
+            "Historical distribution extends across the present India-Pakistan border."
+        ]
+    },
+    {
+        "breed_name": "Kankrej",
+        "animal_type": "cattle",
+        "origin_state": "Gujarat",
+        "origin_region": "North Gujarat and the adjoining Rajasthan border",
+        "purpose": [
+            "draft",
+            "dairy"
+        ],
+        "physical_characteristics": "Large, powerful zebu cattle with a broad forehead and pendulous ears.",
+        "color": "Silver-grey to steel-grey, often darker at the neck, hump, and hindquarters.",
+        "horn_characteristics": "Large lyre-shaped horns sweep outward and upward.",
+        "body_characteristics": "Strong shoulders, deep body, and substantial legs suited to draught work.",
+        "dairy_characteristics": "Dual-purpose breed; cows provide useful milk but dairy yield varies by line and management.",
+        "aliases": [
+            "Kankrej cattle",
+            "Wadhiar"
+        ],
+        "identification_notes": "The lyre-shaped horns and silver-grey coat are characteristic clues, but should not be used alone.",
+        "confidence": "high",
+        "uncertainties": [
+            "Coat darkness changes with age and individual variation."
+        ]
+    },
+    {
+        "breed_name": "Ongole",
+        "animal_type": "cattle",
+        "origin_state": "Andhra Pradesh",
+        "origin_region": "Ongole area of the coastal Andhra tract",
+        "purpose": [
+            "draft",
+            "beef breed heritage"
+        ],
+        "physical_characteristics": "Large, muscular zebu cattle with a broad forehead and strong bone.",
+        "color": "White or light grey, commonly with darker shading on the neck and hump.",
+        "horn_characteristics": "Short to medium horns that curve outward and upward.",
+        "body_characteristics": "Deep chest, powerful shoulders, and a prominent hump.",
+        "dairy_characteristics": "Not primarily selected as a specialized dairy breed; milk information is not used here for classification.",
+        "aliases": [
+            "Nellore",
+            "Ongole cattle"
+        ],
+        "identification_notes": "Large white-grey frame and heavy muscling are useful clues; related white zebu breeds can look similar.",
+        "confidence": "high",
+        "uncertainties": [
+            "The purpose label reflects historical breed use and should not be interpreted as a recommendation for production systems."
+        ]
+    },
+    {
+        "breed_name": "Hariana",
+        "animal_type": "cattle",
+        "origin_state": "Haryana",
+        "origin_region": "Haryana plains, including the Hisar and Rohtak tract",
+        "purpose": [
+            "draft",
+            "dairy"
+        ],
+        "physical_characteristics": "Medium to large white-grey zebu cattle with a straight facial profile.",
+        "color": "White to light grey; bulls are often darker at the neck and shoulders.",
+        "horn_characteristics": "Short horns curve outward and upward.",
+        "body_characteristics": "Strong frame with a well-developed hump and sturdy legs.",
+        "dairy_characteristics": "Dual-purpose breed with moderate milk production; individual performance varies.",
+        "aliases": [
+            "Haryana",
+            "Hariana cattle"
+        ],
+        "identification_notes": "White-grey coat and compact upward-curving horns help, but overlap with other northern zebu breeds is common.",
+        "confidence": "high",
+        "uncertainties": [
+            "Exact local distribution differs among breed registers."
+        ]
+    },
+    {
+        "breed_name": "Deoni",
+        "animal_type": "cattle",
+        "origin_state": "Maharashtra",
+        "origin_region": "Marathwada, especially the Latur and adjoining tract",
+        "purpose": [
+            "dairy",
+            "draft"
+        ],
+        "physical_characteristics": "Medium to large zebu cattle with a broad body and calm temperament reported in breed descriptions.",
+        "color": "White with black or dark markings; some animals are predominantly white.",
+        "horn_characteristics": "Medium horns curve outward and upward.",
+        "body_characteristics": "Strong, deep body with a moderate hump and sturdy limbs.",
+        "dairy_characteristics": "Dual-purpose breed with useful milk production under local management.",
+        "aliases": [
+            "Deoni cattle",
+            "Dongari"
+        ],
+        "identification_notes": "The white coat with dark markings is a useful clue, but local coat variation is significant.",
+        "confidence": "high",
+        "uncertainties": [
+            "Marking patterns differ between the recognized local types."
+        ]
+    },
+    {
+        "breed_name": "Hallikar",
+        "animal_type": "cattle",
+        "origin_state": "Karnataka",
+        "origin_region": "Old Mysore and the southern Karnataka dry tract",
+        "purpose": [
+            "draft"
+        ],
+        "physical_characteristics": "Medium-sized, compact zebu cattle valued for endurance and draught ability.",
+        "color": "Grey to dark grey, often with darker neck, hump, and hindquarters.",
+        "horn_characteristics": "Long, narrow horns curve backward and upward.",
+        "body_characteristics": "Lean, strong frame with hard feet and a prominent hump.",
+        "dairy_characteristics": "Not primarily a dairy breed; specialized milk claims are not assigned.",
+        "aliases": [
+            "Hallikar cattle"
+        ],
+        "identification_notes": "Long backward-curving horns and a compact grey draught build are useful clues.",
+        "confidence": "high",
+        "uncertainties": [
+            "Horn length and coat shade vary between individuals."
+        ]
+    },
+    {
+        "breed_name": "Kangayam",
+        "animal_type": "cattle",
+        "origin_state": "Tamil Nadu",
+        "origin_region": "Kongu region, especially the Kangeyam area",
+        "purpose": [
+            "draft"
+        ],
+        "physical_characteristics": "Medium-sized, compact and muscular zebu cattle adapted to dry conditions.",
+        "color": "Grey or white-grey; bulls are commonly darker at the head, neck, hump, and quarters.",
+        "horn_characteristics": "Medium to long horns curve outward and backward, then inward toward the tips.",
+        "body_characteristics": "Strong shoulders, compact body, and hard legs suited to draught work.",
+        "dairy_characteristics": "Not primarily a dairy breed; no specific production figure is asserted.",
+        "aliases": [
+            "Kangeyam",
+            "Kangayam cattle"
+        ],
+        "identification_notes": "Compact grey draught build and inward-curving horn tips are useful clues.",
+        "confidence": "high",
+        "uncertainties": [
+            "Horn shape varies with age and sex."
+        ]
+    },
+    {
+        "breed_name": "Krishna Valley",
+        "animal_type": "cattle",
+        "origin_state": "Karnataka",
+        "origin_region": "Krishna River valley across northern Karnataka and adjoining Maharashtra",
+        "purpose": [
+            "draft",
+            "dairy"
+        ],
+        "physical_characteristics": "Large, strong zebu cattle with a broad body and substantial bone.",
+        "color": "White to grey, often with darker shading on the neck and shoulders.",
+        "horn_characteristics": "Medium horns curve outward and upward.",
+        "body_characteristics": "Deep chest and strong hindquarters suited to draught work.",
+        "dairy_characteristics": "Dual-purpose breed; milk performance is variable and not treated as a fixed classifier trait.",
+        "aliases": [
+            "Krishna Valley cattle"
+        ],
+        "identification_notes": "Large white-grey frame and Krishna valley provenance are useful context; visual separation from related grey breeds is difficult.",
+        "confidence": "medium",
+        "uncertainties": [
+            "Breed boundaries and reported local distribution vary between references."
+        ]
+    },
+    {
+        "breed_name": "Amritmahal",
+        "animal_type": "cattle",
+        "origin_state": "Karnataka",
+        "origin_region": "Old Mysore region",
+        "purpose": [
+            "draft"
+        ],
+        "physical_characteristics": "Medium-sized, active zebu cattle with a compact, muscular frame.",
+        "color": "Grey to dark grey, with darker shading commonly seen in bulls.",
+        "horn_characteristics": "Long horns curve upward and slightly outward.",
+        "body_characteristics": "Strong shoulders, firm back, and hard limbs suited to draught work.",
+        "dairy_characteristics": "Not primarily a dairy breed; no fixed milk-yield claim is made.",
+        "aliases": [
+            "Amrit Mahal",
+            "Amritmahal cattle"
+        ],
+        "identification_notes": "Compact grey draught build and long upward horns are useful clues.",
+        "confidence": "high",
+        "uncertainties": [
+            "Coat shade and horn curvature vary among lines."
+        ]
+    },
+    {
+        "breed_name": "Dangi",
+        "animal_type": "cattle",
+        "origin_state": "Maharashtra",
+        "origin_region": "Western Maharashtra and adjoining Gujarat hill tracts",
+        "purpose": [
+            "draft",
+            "dairy"
+        ],
+        "physical_characteristics": "Medium-sized zebu cattle adapted to hilly and high-rainfall conditions.",
+        "color": "White or grey with irregular black or brown patches.",
+        "horn_characteristics": "Short to medium horns curve outward and upward.",
+        "body_characteristics": "Compact body with sturdy legs and a moderate hump.",
+        "dairy_characteristics": "Dual-purpose local breed; production varies with environment and management.",
+        "aliases": [
+            "Dangi cattle"
+        ],
+        "identification_notes": "Irregular dark patches on a white-grey coat are suggestive but not unique.",
+        "confidence": "medium",
+        "uncertainties": [
+            "The breed's exact core tract is described differently across regional sources."
+        ]
+    },
+    {
+        "breed_name": "Malnad Gidda",
+        "animal_type": "cattle",
+        "origin_state": "Karnataka",
+        "origin_region": "Malnad and Western Ghats foothills",
+        "purpose": [
+            "draft",
+            "dairy"
+        ],
+        "physical_characteristics": "Small, hardy zebu cattle adapted to hilly, humid environments.",
+        "color": "Usually dark brown to black, sometimes with lighter markings.",
+        "horn_characteristics": "Small to medium horns with variable upward and outward curvature.",
+        "body_characteristics": "Small compact frame, sturdy legs, and a moderate hump.",
+        "dairy_characteristics": "Local dual-purpose breed; milk output is modest and variable.",
+        "aliases": [
+            "Malnad Gidda cattle",
+            "Gidda"
+        ],
+        "identification_notes": "Small stature and dark coat are useful clues, but size is affected by age and nutrition.",
+        "confidence": "high",
+        "uncertainties": [
+            "Local populations show coat and horn variation."
+        ]
+    },
+    {
+        "breed_name": "Murrah",
+        "animal_type": "buffalo",
+        "origin_state": "Haryana",
+        "origin_region": "Haryana and adjoining Delhi and Punjab tract",
+        "purpose": [
+            "dairy"
+        ],
+        "physical_characteristics": "Large, heavy dairy buffalo with a compact head and deep body.",
+        "color": "Usually jet black, sometimes with small white markings.",
+        "horn_characteristics": "Short, tightly curled horns close to the head.",
+        "body_characteristics": "Broad, deep body with a well-developed udder in milking females.",
+        "dairy_characteristics": "Widely recognized as a major dairy buffalo breed; yield varies by genetics, feeding, and management.",
+        "aliases": [
+            "Murrah buffalo"
+        ],
+        "identification_notes": "Black coat and tightly curled horns are strong clues, but Murrah-type animals and crossbreds can look similar.",
+        "confidence": "high",
+        "uncertainties": [
+            "Small white markings occur in some animals."
+        ]
+    },
+    {
+        "breed_name": "Jaffarabadi",
+        "animal_type": "buffalo",
+        "origin_state": "Gujarat",
+        "origin_region": "Saurashtra, especially the Jamnagar and Junagadh tract",
+        "purpose": [
+            "dairy"
+        ],
+        "physical_characteristics": "Very large buffalo with a broad forehead and heavy frame.",
+        "color": "Black, sometimes with limited white markings.",
+        "horn_characteristics": "Very large horns sweep downward and outward from the head.",
+        "body_characteristics": "Massive body, deep chest, and heavy bone.",
+        "dairy_characteristics": "Recognized dairy buffalo; production is variable and no fixed yield is asserted.",
+        "aliases": [
+            "Jaffarabadi buffalo"
+        ],
+        "identification_notes": "Large body and broad, downward-sweeping horns are useful clues.",
+        "confidence": "high",
+        "uncertainties": [
+            "Horn extent and curve vary among individuals."
+        ]
+    },
+    {
+        "breed_name": "Surti",
+        "animal_type": "buffalo",
+        "origin_state": "Gujarat",
+        "origin_region": "Charotar and adjoining Kheda, Anand, and Vadodara tract",
+        "purpose": [
+            "dairy"
+        ],
+        "physical_characteristics": "Medium-sized dairy buffalo with a relatively compact frame.",
+        "color": "Black to brownish black, sometimes with white markings on the face or tail switch.",
+        "horn_characteristics": "Medium horns curve sickle-like upward and backward.",
+        "body_characteristics": "Moderate body depth and a developed udder in milking females.",
+        "dairy_characteristics": "A recognized dairy buffalo breed with milk composition valued in traditional dairying; individual yield varies.",
+        "aliases": [
+            "Surati",
+            "Surti buffalo"
+        ],
+        "identification_notes": "Sickle-shaped horns and medium frame help distinguish it from larger buffalo breeds.",
+        "confidence": "high",
+        "uncertainties": [
+            "Coat shade and white markings are variable."
+        ]
+    },
+    {
+        "breed_name": "Mehsana",
+        "animal_type": "buffalo",
+        "origin_state": "Gujarat",
+        "origin_region": "Mehsana district and adjoining north Gujarat",
+        "purpose": [
+            "dairy"
+        ],
+        "physical_characteristics": "Medium to large dairy buffalo with a strong but comparatively angular frame.",
+        "color": "Black to dark grey, sometimes with white markings.",
+        "horn_characteristics": "Medium horns curve upward and backward, usually less tightly curled than Murrah horns.",
+        "body_characteristics": "Deep body with a well-developed udder in milking females.",
+        "dairy_characteristics": "Recognized dairy breed developed in north Gujarat; production varies with management.",
+        "aliases": [
+            "Mehsani",
+            "Mehsana buffalo"
+        ],
+        "identification_notes": "Intermediate body type and horn shape can overlap with Murrah and Surti; provenance is useful.",
+        "confidence": "high",
+        "uncertainties": [
+            "The breed has historical influence from more than one buffalo population, so visual boundaries overlap."
+        ]
+    },
+    {
+        "breed_name": "Nili-Ravi",
+        "animal_type": "buffalo",
+        "origin_state": "Punjab (historical region)",
+        "origin_region": "Indus river tract around the Ravi and Sutlej",
+        "purpose": [
+            "dairy"
+        ],
+        "physical_characteristics": "Large dairy buffalo with a deep body and comparatively fine head.",
+        "color": "Black, commonly with white markings on the forehead, muzzle, tail switch, and lower legs.",
+        "horn_characteristics": "Small, tightly curled horns.",
+        "body_characteristics": "Deep barrel, strong hindquarters, and well-developed udder in milking females.",
+        "dairy_characteristics": "Recognized high-value dairy buffalo breed; production varies by line and management.",
+        "aliases": [
+            "Nili Ravi",
+            "Nili-Ravi buffalo"
+        ],
+        "identification_notes": "White facial and lower-leg markings plus tightly curled horns are useful clues.",
+        "confidence": "high",
+        "uncertainties": [
+            "The historical origin region crosses the present India-Pakistan border."
+        ]
+    },
+    {
+        "breed_name": "Bhadawari",
+        "animal_type": "buffalo",
+        "origin_state": "Uttar Pradesh",
+        "origin_region": "Bhadawar tract around Agra and the Chambal-Yamuna ravines",
+        "purpose": [
+            "dairy"
+        ],
+        "physical_characteristics": "Medium-sized buffalo adapted to hot, relatively dry conditions.",
+        "color": "Copper, reddish brown, or brown-black; coat shade is variable.",
+        "horn_characteristics": "Medium horns curve backward and upward.",
+        "body_characteristics": "Compact body with a moderate frame and sturdy limbs.",
+        "dairy_characteristics": "Known as a dairy buffalo with milk valued for relatively high fat; exact composition varies and is not fixed here.",
+        "aliases": [
+            "Bhadawari buffalo",
+            "Bhadawari"
+        ],
+        "identification_notes": "Brown or copper coloration is suggestive, but coat shade alone is insufficient for identification.",
+        "confidence": "medium",
+        "uncertainties": [
+            "Reported distribution includes adjoining Madhya Pradesh, and coat descriptions vary by source."
+        ]
+    },
+    {
+        "breed_name": "Pandharpuri",
+        "animal_type": "buffalo",
+        "origin_state": "Maharashtra",
+        "origin_region": "Bhima and Krishna river tracts around Solapur and adjoining districts",
+        "purpose": [
+            "dairy",
+            "draft"
+        ],
+        "physical_characteristics": "Medium to large buffalo with a long, relatively narrow body.",
+        "color": "Usually black, sometimes with limited white markings.",
+        "horn_characteristics": "Very long horns extend backward and may twist or rise at the tips.",
+        "body_characteristics": "Long frame, strong limbs, and a developed udder in milking females.",
+        "dairy_characteristics": "Regional dairy buffalo; production varies with local management.",
+        "aliases": [
+            "Pandharpuri buffalo"
+        ],
+        "identification_notes": "Exceptionally long horns are the most conspicuous clue, but horn shape changes with age.",
+        "confidence": "high",
+        "uncertainties": [
+            "The exact horn curve and regional range vary among descriptions."
+        ]
+    },
+    {
+        "breed_name": "Toda",
+        "animal_type": "buffalo",
+        "origin_state": "Tamil Nadu",
+        "origin_region": "Nilgiri Hills",
+        "purpose": [
+            "dairy",
+            "cultural"
+        ],
+        "physical_characteristics": "Medium-sized hill buffalo associated with the Nilgiri plateau.",
+        "color": "Grey to ash-grey, often with lighter markings and a pronounced dorsal stripe or chevron pattern.",
+        "horn_characteristics": "Large horns curve outward, upward, and inward toward the tips.",
+        "body_characteristics": "Compact, sturdy hill-adapted frame.",
+        "dairy_characteristics": "Maintained traditionally by the Toda community; production is not represented by a fixed figure.",
+        "aliases": [
+            "Toda buffalo",
+            "Nilgiri buffalo"
+        ],
+        "identification_notes": "Hill provenance, ash-grey coat, and large curved horns are useful clues; cultural association is not a visual trait.",
+        "confidence": "high",
+        "uncertainties": [
+            "Coat markings and horn curvature vary among animals."
+        ]
+    }
+]
