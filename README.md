@@ -40,4 +40,3 @@ model is installed. Expected application errors use a non-zero exit code.
 - `models/`: model artifacts
 - `scripts/`: development and data utilities
 - `docs/`: project documentation
-# breed-recognition
