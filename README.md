@@ -29,6 +29,7 @@ python main.py breeds --search gir
 python main.py info
 python main.py info --breed gir
 python main.py predict path/to/animal.jpg
+python scripts/prepare_dataset.py
 ```
 
 The database is stored in `app/data/breeds.json`. Each record includes a
@@ -47,3 +48,20 @@ model is installed. Expected application errors use a non-zero exit code.
 - `models/`: model artifacts
 - `scripts/`: development and data utilities
 - `docs/`: project documentation
+
+## Dataset preparation
+
+Place source images under `datasets/raw/<animal_type>/<breed>/<animal_id>/`.
+The preparation script writes resized train, validation, and test images under
+`datasets/processed/` and generates a JSON and Markdown report. The animal ID
+directory is used as the split group to prevent data leakage. See
+`datasets/README.md` for the complete layout and options.
+
+## Starting the terminal application
+
+From the repository root, activate the environment and run:
+
+```bash
+source .venv/bin/activate
+python main.py --help
+```
