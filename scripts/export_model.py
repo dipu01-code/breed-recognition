@@ -21,6 +21,8 @@ def main() -> int:
     parser.add_argument("--format", choices=("torchscript", "onnx"), default="torchscript")
     args = parser.parse_args()
 
+    if not args.checkpoint.exists():
+        parser.error(f"Checkpoint not found: {args.checkpoint}. Run scripts/train.py first.")
     checkpoint = torch.load(args.checkpoint, map_location="cpu", weights_only=False)
     model = build_model(len(checkpoint["class_to_idx"]), checkpoint["architecture"], pretrained=False)
     model.load_state_dict(checkpoint["model_state"])

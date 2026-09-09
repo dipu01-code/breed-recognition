@@ -26,6 +26,8 @@ def main() -> int:
     parser.add_argument("--device", default="cpu")
     args = parser.parse_args()
 
+    if not args.checkpoint.exists():
+        parser.error(f"Checkpoint not found: {args.checkpoint}. Run scripts/train.py first.")
     checkpoint = torch.load(args.checkpoint, map_location=args.device, weights_only=False)
     class_to_idx = checkpoint["class_to_idx"]
     dataset, loader = make_loader(args.data / args.split, False, checkpoint["image_size"], args.batch_size, 42, args.workers)

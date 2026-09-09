@@ -44,7 +44,8 @@ def main() -> int:
     seed_everything(args.seed)
     if args.device == "cuda" and not torch.cuda.is_available():
         parser.error("CUDA was requested but is not available")
-    device = torch.device("cuda" if args.device == "auto" and torch.cuda.is_available() else args.device)
+    resolved_device = "cuda" if args.device == "auto" and torch.cuda.is_available() else "cpu" if args.device == "auto" else args.device
+    device = torch.device(resolved_device)
     train_dataset, train_loader = make_loader(args.data / "train", True, args.image_size, args.batch_size, args.seed, args.workers)
     validation_dataset, validation_loader = make_loader(args.data / "validation", False, args.image_size, args.batch_size, args.seed, args.workers)
     if train_dataset.classes != validation_dataset.classes:
