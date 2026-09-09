@@ -15,8 +15,9 @@ def main() -> int:
     parser.add_argument("--width", type=int, default=224)
     parser.add_argument("--height", type=int, default=224)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--augment", action="store_true", help="Add horizontally flipped training images.")
     args = parser.parse_args()
-    report = DatasetPipeline(args.raw, args.output, (args.width, args.height), args.seed).run()
+    report = DatasetPipeline(args.raw, args.output, (args.width, args.height), args.seed).run(augment=args.augment)
     print(f"Prepared {report.number_of_images} images across {report.number_of_classes} classes.")
     print(f"Reports: {args.output / 'dataset_report.json'} and {args.output / 'dataset_report.md'}")
     return 0

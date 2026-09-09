@@ -11,7 +11,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterator
 
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".webp", ".tif", ".tiff"}
 
@@ -128,14 +128,21 @@ class DatasetPipeline:
             counts[split] += len(group)
         return result
 
-    def _write_image(self, record: ImageRecord, destination: Path) -> None:
+    def _write_image(self, record: ImageRecord, destination: Path, augment: bool = False) -> None:
         destination.parent.mkdir(parents=True, exist_ok=True)
         with Image.open(record.source) as image:
-            image.convert("RGB").resize(self.image_size, Image.Resampling.LANCZOS).save(
+            processed = image.convert("RGB").resize(self.image_size, Image.Resampling.LANCZOS)
+            processed.save(
                 destination, format="JPEG", quality=95
             )
+            if augment:
+                ImageOps.mirror(processed).save(
+                    destination.with_name(f"{destination.stem}_flip.jpg"),
+                    format="JPEG",
+                    quality=95,
+                )
 
-    def run(self) -> DatasetReport:
+    def run(self, augment: bool = False) -> DatasetReport:
         records, corrupted, duplicates = self.discover()
         if self.output_dir.exists():
             for split in ("train", "validation", "test"):
@@ -147,7 +154,7 @@ class DatasetPipeline:
                     self.output_dir / split / record.animal_type / record.breed
                     / f"{record.animal_id}_{record.source.stem}.jpg"
                 )
-                self._write_image(record, destination)
+                self._write_image(record, destination, augment=augment and split == "train")
 
         dimensions = Counter(f"{record.width}x{record.height}" for record in records)
         report = DatasetReport(

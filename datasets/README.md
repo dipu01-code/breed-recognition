@@ -23,8 +23,13 @@ Run preprocessing from the repository root:
 ```bash
 python scripts/prepare_dataset.py
 python scripts/prepare_dataset.py --raw datasets/raw --output datasets/processed --seed 42
+python scripts/dataset_stats.py --raw datasets/raw --output datasets/processed
 ```
 
 The command validates images, detects corrupt files and exact duplicates,
 resizes images to 224x224 RGB JPEGs, creates best-effort 70/15/15 splits, and
 writes `dataset_report.json` plus `dataset_report.md`.
+Use `--augment` to add deterministic horizontal-flip copies to the training
+split only; validation and test images are never augmented. No dataset is
+included in the repository. Supply real images in the documented `raw`
+structure before running these commands.

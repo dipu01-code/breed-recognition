@@ -65,3 +65,16 @@ def test_load_normalized_returns_rgb_float_values(tmp_path: Path):
     assert result.shape == (2, 2, 3)
     assert result.dtype == np.float32
     assert np.all(result >= 0) and np.all(result <= 1)
+
+
+def test_optional_augmentation_only_writes_training_flip(tmp_path: Path):
+    raw = tmp_path / "raw"
+    for animal_number in range(4):
+        write_image(raw / "cattle" / "gir" / f"animal-{animal_number}" / "front.png", (animal_number, 10, 20))
+
+    output = tmp_path / "processed"
+    DatasetPipeline(raw, output, seed=2).run(augment=True)
+
+    assert list((output / "train").rglob("*_flip.jpg"))
+    assert not list((output / "validation").rglob("*_flip.jpg"))
+    assert not list((output / "test").rglob("*_flip.jpg"))
