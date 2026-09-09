@@ -70,3 +70,15 @@ def test_predict_without_model(caplog, tmp_path: Path):
     image.write_bytes(b"placeholder")
     assert main(["predict", str(image)]) == 2
     assert "No trained model" in caplog.text
+
+
+def test_breed_repository_supports_phase_two_queries():
+    from app.data.breed_repository import BreedRepository, MODEL_SUPPORTED_BREEDS
+
+    repository = BreedRepository()
+    assert len(repository.get_all_breeds()) >= 19
+    assert {breed.animal_type for breed in repository.get_by_animal_type("buffalo")} == {"buffalo"}
+    assert repository.get_breed("gyr").breed_name == "Gir"
+    assert [breed.breed_name for breed in repository.search("murrah")] == ["Murrah"]
+    assert not MODEL_SUPPORTED_BREEDS
+    assert not repository.is_model_supported("Gir")
