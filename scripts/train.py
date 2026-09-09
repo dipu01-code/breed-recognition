@@ -46,8 +46,18 @@ def main() -> int:
         parser.error("CUDA was requested but is not available")
     resolved_device = "cuda" if args.device == "auto" and torch.cuda.is_available() else "cpu" if args.device == "auto" else args.device
     device = torch.device(resolved_device)
-    train_dataset, train_loader = make_loader(args.data / "train", True, args.image_size, args.batch_size, args.seed, args.workers)
-    validation_dataset, validation_loader = make_loader(args.data / "validation", False, args.image_size, args.batch_size, args.seed, args.workers)
+    train_root = args.data / "train"
+    validation_root = args.data / "validation"
+    if not train_root.exists() or not any(path.is_file() for path in train_root.rglob("*")):
+        parser.error(
+            f"No training images found in {train_root}. Add images under "
+            "datasets/raw/<animal_type>/<breed>/<animal_id>/ and run "
+            "python scripts/prepare_dataset.py first."
+        )
+    if not validation_root.exists() or not any(path.is_file() for path in validation_root.rglob("*")):
+        parser.error(f"No validation images found in {validation_root}. Add more animals and rerun dataset preparation.")
+    train_dataset, train_loader = make_loader(train_root, True, args.image_size, args.batch_size, args.seed, args.workers)
+    validation_dataset, validation_loader = make_loader(validation_root, False, args.image_size, args.batch_size, args.seed, args.workers)
     if train_dataset.classes != validation_dataset.classes:
         raise ValueError("Training and validation class labels do not match")
 
