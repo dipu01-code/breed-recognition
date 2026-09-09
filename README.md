@@ -35,6 +35,19 @@ python scripts/evaluate.py --checkpoint models/baseline/best.pt --split test
 python scripts/export_model.py --checkpoint models/baseline/best.pt --output models/baseline/model.pt
 ```
 
+## Terminal application
+
+Install dependencies, then launch the full-screen Textual interface:
+
+```bash
+python -m pip install -r requirements.txt
+python main.py
+```
+
+Use the arrow keys to navigate HOME, PREDICT, BREEDS, HISTORY, MODEL, and
+ABOUT. Press Enter to select, Escape to return home, `?` for help, and `Q` to
+quit. Prediction remains unavailable until a trained model is installed.
+
 The database is stored in `app/data/breeds.json`. Each record includes a
 confidence level and an `uncertainties` list so regional or variable traits are
 not presented as universal facts.

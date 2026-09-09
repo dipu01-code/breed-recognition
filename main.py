@@ -1,6 +1,6 @@
-"""Executable entry point for the breed recognition CLI."""
+"""Executable entry point for the breed recognition TUI."""
 
-from app.cli.main import main
+from app.main import main
 
 
 if __name__ == "__main__":
