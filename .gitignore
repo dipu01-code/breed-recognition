@@ -12,5 +12,6 @@ build/
 datasets/raw/
 datasets/processed/
 models/checkpoints/
+models/baseline/
 models/*.onnx
 models/*.tflite

@@ -1,1 +1,1 @@
-"""Model loading and model metadata."""
+"""Model loading, model metadata, and baseline classifiers."""
