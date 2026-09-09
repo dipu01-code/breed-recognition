@@ -61,7 +61,7 @@ def run(args: argparse.Namespace, settings: Settings) -> int:
         return 0
 
     if args.command == "predict":
-        predict(args.image, settings.model_dir)
+        print(predict(args.image, settings.model_dir))
         return 0
 
     return 0

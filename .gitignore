@@ -13,5 +13,9 @@ datasets/raw/
 datasets/processed/
 models/checkpoints/
 models/baseline/
+models/best_model.*
+models/last_model.pt
+models/classes.json
+models/evaluation/
 models/*.onnx
 models/*.tflite

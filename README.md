@@ -30,9 +30,9 @@ python main.py info
 python main.py info --breed gir
 python main.py predict path/to/animal.jpg
 python scripts/prepare_dataset.py
-python scripts/train.py --data datasets/processed --output models/baseline
-python scripts/evaluate.py --checkpoint models/baseline/best.pt --split test
-python scripts/export_model.py --checkpoint models/baseline/best.pt --output models/baseline/model.pt
+python scripts/train.py --data datasets/processed --output models
+python scripts/evaluate.py --checkpoint models/best_model.pt --split test
+python scripts/export_model.py --checkpoint models/best_model.pt --output models/best_model.ts
 ```
 
 ## Terminal application
@@ -60,29 +60,33 @@ model is installed. Expected application errors use a non-zero exit code.
 The baseline uses transfer learning with MobileNetV3-Small by default. It
 supports EfficientNet-B0 and ResNet18, applies training augmentation, uses
 class-weighted loss, and writes reproducible checkpoints and metrics under
-`models/baseline/`. Pretrained ImageNet weights are downloaded on the first
+`models/`. Pretrained ImageNet weights are downloaded on the first
 training run; use `--no-pretrained` when working offline.
+
+No real training accuracy is included in this repository because the actual
+dataset is not committed. The pipeline was smoke-tested with a tiny synthetic
+dataset only; those metrics must not be interpreted as breed-model performance.
 
 Train:
 
 ```bash
-python scripts/train.py --data datasets/processed --output models/baseline --epochs 10
+python scripts/train.py --data datasets/processed --output models --epochs 10
 ```
 
 Evaluate and generate metrics plus a confusion matrix:
 
 ```bash
-python scripts/evaluate.py --checkpoint models/baseline/best.pt --data datasets/processed --split test
+python scripts/evaluate.py --checkpoint models/best_model.pt --data datasets/processed --split test
 ```
 
 Export a CPU-friendly TorchScript model and its class-label mapping:
 
 ```bash
-python scripts/export_model.py --checkpoint models/baseline/best.pt --output models/baseline/model.pt --format torchscript
+python scripts/export_model.py --checkpoint models/best_model.pt --output models/best_model.ts --format torchscript
 ```
 
 Use `--format onnx` to export ONNX instead. Training writes `best.pt`,
-`last.pt`, `class_labels.json`, `history.json`, and confusion-matrix files.
+`last_model.pt`, `classes.json`, `history.json`, and confusion-matrix files.
 
 ## Layout
 

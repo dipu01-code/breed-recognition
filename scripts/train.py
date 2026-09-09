@@ -27,7 +27,7 @@ from app.models.baseline import (
 def main() -> int:
     parser = argparse.ArgumentParser(description="Train a transfer-learning breed classifier.")
     parser.add_argument("--data", type=Path, default=Path("datasets/processed"))
-    parser.add_argument("--output", type=Path, default=Path("models/baseline"))
+    parser.add_argument("--output", type=Path, default=Path("models"))
     parser.add_argument("--architecture", choices=SUPPORTED_ARCHITECTURES, default="mobilenet_v3_small")
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=32)
@@ -65,7 +65,7 @@ def main() -> int:
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.learning_rate)
     criterion = nn.CrossEntropyLoss(weight=class_weights(train_dataset).to(device))
     args.output.mkdir(parents=True, exist_ok=True)
-    (args.output / "class_labels.json").write_text(json.dumps(train_dataset.class_to_idx, indent=2), encoding="utf-8")
+    (args.output / "classes.json").write_text(json.dumps(train_dataset.class_to_idx, indent=2), encoding="utf-8")
 
     history = []
     best_validation_loss = float("inf")
@@ -75,10 +75,10 @@ def main() -> int:
         row = {"epoch": epoch, "train": training, "validation": validation}
         history.append(row)
         (args.output / "history.json").write_text(json.dumps(history, indent=2), encoding="utf-8")
-        save_checkpoint(args.output / "last.pt", model, optimizer, epoch, args.architecture, train_dataset.class_to_idx, args.image_size, history)
+        save_checkpoint(args.output / "last_model.pt", model, optimizer, epoch, args.architecture, train_dataset.class_to_idx, args.image_size, history)
         if validation["loss"] < best_validation_loss:
             best_validation_loss = validation["loss"]
-            save_checkpoint(args.output / "best.pt", model, optimizer, epoch, args.architecture, train_dataset.class_to_idx, args.image_size, history)
+            save_checkpoint(args.output / "best_model.pt", model, optimizer, epoch, args.architecture, train_dataset.class_to_idx, args.image_size, history)
             save_confusion_matrix(validation["confusion_matrix"], train_dataset.classes, args.output)
         print(f"epoch={epoch} train_loss={training['loss']:.4f} val_loss={validation['loss']:.4f} val_f1={validation['f1']:.4f}")
     return 0

@@ -17,10 +17,10 @@ from app.models.baseline import build_model, make_loader, run_epoch, save_confus
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Evaluate a trained breed classifier.")
-    parser.add_argument("--checkpoint", type=Path, default=Path("models/baseline/best.pt"))
+    parser.add_argument("--checkpoint", type=Path, default=Path("models/best_model.pt"))
     parser.add_argument("--data", type=Path, default=Path("datasets/processed"))
     parser.add_argument("--split", choices=("validation", "test"), default="test")
-    parser.add_argument("--output", type=Path, default=Path("models/baseline/evaluation"))
+    parser.add_argument("--output", type=Path, default=Path("models/evaluation"))
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--workers", type=int, default=0)
     parser.add_argument("--device", default="cpu")

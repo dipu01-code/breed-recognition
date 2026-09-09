@@ -16,8 +16,8 @@ from app.models.baseline import build_model
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Export a trained breed classifier.")
-    parser.add_argument("--checkpoint", type=Path, default=Path("models/baseline/best.pt"))
-    parser.add_argument("--output", type=Path, default=Path("models/baseline/model.pt"))
+    parser.add_argument("--checkpoint", type=Path, default=Path("models/best_model.pt"))
+    parser.add_argument("--output", type=Path, default=Path("models/best_model.ts"))
     parser.add_argument("--format", choices=("torchscript", "onnx"), default="torchscript")
     args = parser.parse_args()
 
