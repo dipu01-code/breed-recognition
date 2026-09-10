@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 import torch
-from PIL import Image
+from PIL import Image, ImageFilter
 
 from app.inference.predictor import InferenceError, Predictor
 
@@ -17,11 +17,13 @@ def write_image(path: Path) -> None:
 def write_model(directory: Path, outputs: int = 2) -> None:
     class FixedModel(torch.nn.Module):
         def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-            return torch.tensor([[3.0, 1.0]], dtype=torch.float32).expand(inputs.shape[0], -1)
+            scores = torch.arange(outputs, 0, -1, dtype=torch.float32).unsqueeze(0)
+            return scores.expand(inputs.shape[0], -1)
 
     directory.mkdir(parents=True)
     torch.jit.trace(FixedModel(), torch.zeros(1, 3, 16, 16)).save(directory / "best_model.ts")
-    (directory / "classes.json").write_text(json.dumps({"Gir": 0, "Sahiwal": 1}), encoding="utf-8")
+    labels = {name: index for index, name in enumerate(("Gir", "Sahiwal", "Kankrej")[:outputs])}
+    (directory / "classes.json").write_text(json.dumps(labels), encoding="utf-8")
     (directory / "preprocessing.json").write_text(
         json.dumps({"image_size": 16, "mean": [0.485, 0.456, 0.406], "std": [0.229, 0.224, 0.225]}),
         encoding="utf-8",
@@ -41,6 +43,29 @@ def test_predictor_returns_ranked_structured_probabilities(tmp_path: Path):
     assert result["top_predictions"][0]["breed"] == "Gir"
     assert result["top_predictions"][0]["confidence"] > result["top_predictions"][1]["confidence"]
     assert result["is_mock"] is False
+
+
+def test_predictor_returns_top_three_when_three_classes_exist(tmp_path: Path):
+    model_dir = tmp_path / "model"
+    image = tmp_path / "cow.jpg"
+    write_model(model_dir, outputs=3)
+    write_image(image)
+
+    result = Predictor(model_dir).predict(image, top_k=3)
+
+    assert [item["breed"] for item in result["top_predictions"]] == ["Gir", "Sahiwal", "Kankrej"]
+
+
+@pytest.mark.parametrize("extension", [".png", ".webp"])
+def test_predictor_accepts_supported_image_formats(tmp_path: Path, extension: str):
+    model_dir = tmp_path / "model"
+    image = tmp_path / f"animal{extension}"
+    write_model(model_dir)
+    write_image(image)
+
+    result = Predictor(model_dir).predict(image)
+
+    assert result["predicted_breed"] == "Gir"
 
 
 def test_predictor_handles_missing_and_invalid_inputs(tmp_path: Path):
@@ -96,3 +121,35 @@ def test_predictor_marks_low_confidence_and_recommends_verification(tmp_path: Pa
 def test_predictor_rejects_invalid_confidence_threshold(tmp_path: Path):
     with pytest.raises(ValueError, match="between 0 and 1"):
         Predictor(tmp_path, confidence_threshold=1.1)
+
+
+@pytest.mark.parametrize("color", [(0, 0, 0), (255, 255, 255), (8, 8, 8)])
+def test_predictor_handles_dark_bright_and_low_signal_images(tmp_path: Path, color: tuple[int, int, int]):
+    model_dir = tmp_path / "model"
+    image = tmp_path / "condition.jpg"
+    write_model(model_dir)
+    Image.new("RGB", (64, 32), color).save(image)
+
+    result = Predictor(model_dir).predict(image)
+
+    assert len(result["top_predictions"]) == 2
+
+
+def test_predictor_handles_blurry_image(tmp_path: Path):
+    model_dir = tmp_path / "model"
+    image = tmp_path / "blurry.jpg"
+    write_model(model_dir)
+    Image.effect_noise((64, 32), 20).filter(ImageFilter.GaussianBlur(4)).convert("RGB").save(image)
+
+    result = Predictor(model_dir).predict(image, top_k=3)
+
+    assert 1 <= len(result["top_predictions"]) <= 3
+
+
+def test_predictor_rejects_incorrect_model_class_mapping(tmp_path: Path):
+    model_dir = tmp_path / "model"
+    write_model(model_dir)
+    (model_dir / "classes.json").write_text(json.dumps({"Gir": 0, "Sahiwal": 2}), encoding="utf-8")
+
+    with pytest.raises(InferenceError, match="contiguous indexes"):
+        Predictor(model_dir)
