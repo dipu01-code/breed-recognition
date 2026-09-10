@@ -91,17 +91,17 @@ class BreedRecognizerApp(App[None]):
         yield Static("Up/Down Navigate   Left/Right Panels   Enter Select   Esc Back   R Refresh   ? Help   Q Quit", id="status")
         yield Footer()
 
-    def on_mount(self) -> None:
+    async def on_mount(self) -> None:
         self.query_one("#menu", ListView).focus()
-        self.show_section("HOME")
+        await self.show_section("HOME")
 
-    def on_list_view_selected(self, event: ListView.Selected) -> None:
+    async def on_list_view_selected(self, event: ListView.Selected) -> None:
         item_id = event.item.id or ""
         if item_id.startswith("menu-"):
-            self.show_section(item_id.removeprefix("menu-").upper())
+            await self.show_section(item_id.removeprefix("menu-").upper())
         elif item_id.startswith("dir-"):
             self.current_path = self.directory_targets[item_id]
-            self.populate_files()
+            await self.populate_files()
         elif item_id.startswith("file-"):
             self.show_preview(self.file_targets[item_id])
 
@@ -114,7 +114,7 @@ class BreedRecognizerApp(App[None]):
         breed = self.repository.get_breed(str(row[1]))
         self.show_breed_detail(breed)
 
-    def show_section(self, section: str) -> None:
+    async def show_section(self, section: str) -> None:
         self.active_section = section
         self.active_panel = "menu"
         menu = self.query_one("#menu", ListView)
@@ -128,7 +128,7 @@ class BreedRecognizerApp(App[None]):
         elif section == "PREDICT":
             self.query_one("#screen-body", Static).update("Select an image. The real inference service will be called when you press Enter.")
             self.query_one("#file-selector").remove_class("hidden")
-            self.populate_files()
+            await self.populate_files()
         elif section == "BREEDS":
             self.query_one("#screen-body", Static).update("Database reference. Model-supported breeds are tracked separately.")
             self.query_one("#breed-search").remove_class("hidden")
@@ -151,9 +151,9 @@ class BreedRecognizerApp(App[None]):
             self.query_one(widget_id).add_class("hidden")
         self.query_one("#screen-body", Static).update("")
 
-    def populate_directories(self) -> None:
+    async def populate_directories(self) -> None:
         directory_list = self.query_one("#directory-list", ListView)
-        directory_list.clear()
+        await directory_list.remove_children()
         self.directory_targets.clear()
         parent = self.current_path.parent if self.current_path != self.current_path.parent else self.current_path
         parent_id = "dir-parent"
@@ -168,10 +168,10 @@ class BreedRecognizerApp(App[None]):
             self.directory_targets[directory_id] = directory
             directory_list.append(ListItem(Label(f"[DIR] {directory.name}"), id=directory_id))
 
-    def populate_files(self) -> None:
-        self.populate_directories()
+    async def populate_files(self) -> None:
+        await self.populate_directories()
         file_list = self.query_one("#file-list", ListView)
-        file_list.clear()
+        await file_list.remove_children()
         self.file_targets.clear()
         try:
             files = sorted(path for path in self.current_path.iterdir() if path.is_file() and path.suffix.lower() in SUPPORTED_IMAGE_EXTENSIONS)
@@ -255,14 +255,14 @@ class BreedRecognizerApp(App[None]):
     def _settings_text(self) -> str:
         return f"Project root: {self.settings.project_root}\nModel directory: {self.settings.model_dir}\nCurrent file directory: {self.current_path}\nSupported images: JPG, JPEG, PNG, WEBP"
 
-    def action_refresh(self) -> None:
+    async def action_refresh(self) -> None:
         if self.active_section == "PREDICT":
-            self.populate_files()
+            await self.populate_files()
         elif self.active_section == "BREEDS":
             self.populate_breeds()
 
-    def action_back(self) -> None:
-        self.show_section("HOME")
+    async def action_back(self) -> None:
+        await self.show_section("HOME")
 
     def action_focus_menu(self) -> None:
         self.active_panel = "menu"
