@@ -17,5 +17,6 @@ models/best_model.*
 models/last_model.pt
 models/classes.json
 models/evaluation/
+prediction_history.json
 models/*.onnx
 models/*.tflite

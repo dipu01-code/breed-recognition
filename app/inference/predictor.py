@@ -88,6 +88,7 @@ class Predictor:
         self._image_size = 224
         self._mean = (0.485, 0.456, 0.406)
         self._std = (0.229, 0.224, 0.225)
+        self.model_version = "best_model.ts"
         if not mock:
             self._load()
 
@@ -105,6 +106,13 @@ class Predictor:
             raise InferenceError(f"Unable to load model: {model_path}") from error
         self._labels = _load_labels(labels_path)
         self._image_size, self._mean, self._std = _load_preprocessing(self.model_dir / "preprocessing.json")
+        version_path = self.model_dir / "model_version.json"
+        if version_path.exists():
+            try:
+                version = json.loads(version_path.read_text(encoding="utf-8"))
+                self.model_version = str(version.get("version", self.model_version))
+            except (OSError, json.JSONDecodeError, AttributeError):
+                self.model_version = "best_model.ts"
 
     def _preprocess(self, image_path: Path) -> torch.Tensor:
         try:

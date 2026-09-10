@@ -73,6 +73,12 @@ displayed score is a model score, not a scientifically calibrated probability;
 scores below the threshold are marked low-confidence and recommend manual
 verification.
 
+Successful predictions are stored locally in `prediction_history.json` and are
+shown in the HISTORY screen with timestamp, image, animal type, breed,
+confidence score, and model version. Selecting an entry shows its details.
+Breed origin and physical information shown after a prediction is supporting
+reference metadata only; it does not prove the image belongs to that breed.
+
 Train:
 
 ```bash

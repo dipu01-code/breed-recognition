@@ -15,6 +15,7 @@ from app.config.settings import Settings
 from app.core.breeds import Breed
 from app.data.breed_repository import BreedRepository
 from app.inference.predictor import InferenceError, Predictor, SUPPORTED_IMAGE_EXTENSIONS
+from app.services.history import HistoryStore
 
 
 class BreedRecognizerApp(App[None]):
@@ -41,6 +42,7 @@ class BreedRecognizerApp(App[None]):
     #directory-list, #file-list { height: 1fr; }
     #preview { height: 1fr; color: #b9c8d3; }
     #breed-detail, #prediction, #settings, #about { border: round #2b5878; padding: 1; height: auto; margin-top: 1; }
+    #history-detail { border: round #2b5878; padding: 1; height: auto; margin-top: 1; }
     .hidden { display: none; }
     """
 
@@ -60,6 +62,8 @@ class BreedRecognizerApp(App[None]):
     active_panel = "menu"
     _predictor: Predictor | None = None
     history: list[dict[str, Any]] = []
+    history_store = HistoryStore(Settings.from_project_root().project_root / "prediction_history.json")
+    history_targets: dict[str, dict[str, Any]] = {}
     directory_targets: dict[str, Path] = {}
     file_targets: dict[str, Path] = {}
 
@@ -75,6 +79,8 @@ class BreedRecognizerApp(App[None]):
                 yield Input(placeholder="Search breed name or alias...", id="breed-search", classes="hidden")
                 yield DataTable(id="breed-table", classes="hidden")
                 yield Static(id="breed-detail", classes="hidden")
+                yield DataTable(id="history-table", classes="hidden")
+                yield Static(id="history-detail", classes="hidden")
                 with Horizontal(id="file-selector", classes="hidden"):
                     with Vertical(classes="panel"):
                         yield Static("DIRECTORIES", classes="panel-title")
@@ -93,6 +99,7 @@ class BreedRecognizerApp(App[None]):
 
     async def on_mount(self) -> None:
         self.query_one("#menu", ListView).focus()
+        self.history = self.history_store.load()
         await self.show_section("HOME")
 
     async def on_list_view_selected(self, event: ListView.Selected) -> None:
@@ -111,8 +118,11 @@ class BreedRecognizerApp(App[None]):
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
         row = event.data_table.get_row(event.row_key)
-        breed = self.repository.get_breed(str(row[1]))
-        self.show_breed_detail(breed)
+        if event.data_table.id == "breed-table":
+            breed = self.repository.get_breed(str(row[1]))
+            self.show_breed_detail(breed)
+        elif event.data_table.id == "history-table":
+            self.show_history_detail(self.history_targets[str(event.row_key.value)])
 
     async def show_section(self, section: str) -> None:
         self.active_section = section
@@ -147,7 +157,7 @@ class BreedRecognizerApp(App[None]):
             self.query_one("#about", Static).update("Indian Breed AI\n\nA terminal-first research tool for Indian cattle and buffalo breed recognition.\n\nPredictions are only shown when a trained model is available.")
 
     def _hide_content_widgets(self) -> None:
-        for widget_id in ("#breed-search", "#breed-table", "#breed-detail", "#file-selector", "#prediction", "#settings", "#about"):
+        for widget_id in ("#breed-search", "#breed-table", "#breed-detail", "#history-table", "#history-detail", "#file-selector", "#prediction", "#settings", "#about"):
             self.query_one(widget_id).add_class("hidden")
         self.query_one("#screen-body", Static).update("")
 
@@ -216,8 +226,16 @@ class BreedRecognizerApp(App[None]):
                     confidence_threshold=self.settings.confidence_threshold,
                 )
             result = self._predictor.predict(image_path, top_k=3)
-            self.history.insert(0, {"image": image_path.name, "result": result})
+            record = self.history_store.append(
+                image_path.name,
+                result["animal_type"],
+                result["predicted_breed"],
+                result["confidence"],
+                self._predictor.model_version,
+            )
+            self.history.insert(0, record)
             self.show_prediction(result, image_path.name)
+            self.show_breed_support(result["predicted_breed"])
         except InferenceError as error:
             self.query_one("#prediction", Static).remove_class("hidden")
             self.query_one("#prediction", Static).update(f"PREDICTION UNAVAILABLE\n\n{error}")
@@ -241,6 +259,22 @@ class BreedRecognizerApp(App[None]):
         self.query_one("#prediction", Static).remove_class("hidden")
         self.query_one("#prediction", Static).update("\n".join(lines))
 
+    def show_breed_support(self, breed_name: str) -> None:
+        try:
+            breed = self.repository.get_breed(breed_name)
+        except Exception:
+            return
+        self.query_one("#breed-detail", Static).remove_class("hidden")
+        self.query_one("#breed-detail", Static).update(
+            f"SUPPORTING BREED INFORMATION\n"
+            f"Breed: {breed.breed_name}\n"
+            f"Origin: {breed.origin_region}\n"
+            f"Animal type: {breed.animal_type}\n"
+            f"Characteristics: {breed.physical_characteristics}\n"
+            f"Identification notes: {breed.identification_notes}\n\n"
+            "Reference metadata only; it does not prove the image belongs to this breed."
+        )
+
     def populate_breeds(self, query: str = "") -> None:
         table = self.query_one("#breed-table", DataTable)
         table.clear(columns=True)
@@ -255,11 +289,29 @@ class BreedRecognizerApp(App[None]):
         )
 
     def show_history(self) -> None:
-        if not self.history:
-            text = "No prediction history is available yet."
-        else:
-            text = "\n".join(f"{entry['image']}: {entry['result'].get('predicted_breed', 'unavailable')}" for entry in self.history)
-        self.query_one("#screen-body", Static).update(text)
+        self.query_one("#history-table").remove_class("hidden")
+        self.query_one("#history-detail").remove_class("hidden")
+        self.query_one("#history-table", DataTable).clear(columns=True)
+        table = self.query_one("#history-table", DataTable)
+        table.add_columns("Time", "Animal", "Breed", "Confidence", "Model")
+        self.history_targets.clear()
+        for index, entry in enumerate(self.history):
+            key = str(index)
+            self.history_targets[key] = entry
+            timestamp = entry.get("timestamp", "")
+            time_text = timestamp[11:16] if len(timestamp) >= 16 else timestamp
+            table.add_row(time_text, entry.get("animal_type", "").upper(), entry.get("predicted_breed", ""), f"{entry.get('confidence', 0):.1%}", entry.get("model_version", "unknown"), key=key)
+        self.query_one("#screen-body", Static).update("Select a history entry to view its details." if self.history else "No prediction history is available yet.")
+
+    def show_history_detail(self, entry: dict[str, Any]) -> None:
+        self.query_one("#history-detail", Static).update(
+            f"Image: {entry.get('image_filename', 'unknown')}\n"
+            f"Breed: {entry.get('predicted_breed', 'unknown')}\n"
+            f"Animal type: {entry.get('animal_type', 'unknown')}\n"
+            f"Confidence score: {entry.get('confidence', 0):.1%}\n"
+            f"Model version: {entry.get('model_version', 'unknown')}\n\n"
+            "This record is a previous model output, not independent verification."
+        )
 
     def show_model(self) -> None:
         model = self.settings.model_dir / "best_model.ts"
