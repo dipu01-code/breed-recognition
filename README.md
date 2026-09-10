@@ -16,105 +16,166 @@ python -m pip install pytest
 ```
 
 The CLI has no runtime dependencies at this stage.
+# Indian Breed AI
+
+Indian Breed AI is a terminal-first MVP for exploring Indian cattle and buffalo
+breed recognition. It combines a local breed reference database, a reproducible
+image pipeline, an optional transfer-learning classifier, and a confidence-aware
+Textual interface.
+
+## Problem
+
+Bharat Pashudhan and related livestock workflows need practical breed
+identification support across varied images, regions, lighting, backgrounds, and
+animal poses. Similar indigenous breeds can share visual traits, so an image
+classifier should assist field or research workflows without replacing expert
+verification.
+
+## Solution
+
+```text
+image -> AI model -> breed score -> confidence status -> breed information -> human verification
+```
+
+The application keeps model output, confidence policy, and reference metadata
+separate. Reference information supports investigation; it does not prove that
+the image belongs to the predicted breed.
+
+## Features
+
+- AI image classification pipeline
+- Cattle and buffalo breed recognition support
+- Top-3 model scores
+- Configurable confidence threshold and low-confidence warnings
+- Structured breed database with aliases and uncertainty notes
+- Full-screen Textual terminal UI
+- Local prediction history
+- Manual verification recommendations
+- Dataset validation, grouped splitting, reports, and optional augmentation
+
+## Architecture
+
+```text
+				+----------------------+
+				|      main.py         |
+				+----------+-----------+
+						 |
+				+----------v-----------+
+				|   Textual TUI / CLI  |
+				+----+-------------+---+
+					|             |
+		    +----------v--+     +----v-------------+
+		    | Predictor   |     | BreedRepository  |
+		    +------+------+     +----+-------------+
+				 |                   |
+		+----------v----------+   +---v-------------+
+		| TorchScript model   |   | app/data/breeds |
+		| labels + preprocessing|  | reference data  |
+		+----------+-----------+   +-----------------+
+				 |
+		+----------v-----------+
+		| JSON prediction     |
+		| history and reports |
+		+----------------------+
+```
+
+See [docs/architecture.md](docs/architecture.md) for component boundaries.
+
+## Installation
+
+Python 3.10 or newer is recommended. From the repository root:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m pip install pytest
+```
 
 ## Usage
 
-```bash
-python main.py --help
-python main.py --version
-python main.py breeds
-python main.py breeds --type cattle
-python main.py breeds --type buffalo
-python main.py breeds --search gir
-python main.py info
-python main.py info --breed gir
-python main.py predict path/to/animal.jpg
-python scripts/prepare_dataset.py
-python scripts/train.py --data datasets/processed --output models
-python scripts/evaluate.py --checkpoint models/best_model.pt --split test
-python scripts/export_model.py --checkpoint models/best_model.pt --output models/best_model.ts
-```
-
-## Terminal application
-
-Install dependencies, then launch the full-screen Textual interface:
+Launch the terminal application:
 
 ```bash
-python -m pip install -r requirements.txt
 python main.py
 ```
 
-Use the arrow keys to navigate HOME, PREDICT, BREEDS, HISTORY, MODEL, and
-ABOUT. Press Enter to select, Escape to return home, `?` for help, and `Q` to
-quit. Prediction remains unavailable until a trained model is installed.
+Use Up/Down to navigate, Enter to select, Left/Right to switch file panels,
+Escape to return home, `R` to refresh, `?` for help, and `Q` to quit. The
+PREDICT screen opens in `datasets/raw`, shows directories, supported images, and
+metadata preview, then calls the inference service when an image is selected.
 
-The database is stored in `app/data/breeds.json`. Each record includes a
-confidence level and an `uncertainties` list so regional or variable traits are
-not presented as universal facts.
+The BREEDS screen supports search and details. HISTORY displays successful
+predictions saved in `prediction_history.json`. Without a trained model, the UI
+reports that prediction is unavailable and does not fabricate a result.
 
-`predict` validates the image path and returns a clear message until a trained
-model is installed. Expected application errors use a non-zero exit code.
+## Model
 
-## Baseline model
-
-The baseline uses transfer learning with MobileNetV3-Small by default. It
-supports EfficientNet-B0 and ResNet18, applies training augmentation, uses
-class-weighted loss, and writes reproducible checkpoints and metrics under
-`models/`. Pretrained ImageNet weights are downloaded on the first
-training run; use `--no-pretrained` when working offline.
-
-No real training accuracy is included in this repository because the actual
-dataset is not committed. The pipeline was smoke-tested with a tiny synthetic
-dataset only; those metrics must not be interpreted as breed-model performance.
-
-Predictions use a configurable confidence threshold of `70%` by default. Set
-`BREED_CONFIDENCE_THRESHOLD` to a value between `0` and `1` to change it. The
-displayed score is a model score, not a scientifically calibrated probability;
-scores below the threshold are marked low-confidence and recommend manual
-verification.
-
-Successful predictions are stored locally in `prediction_history.json` and are
-shown in the HISTORY screen with timestamp, image, animal type, breed,
-confidence score, and model version. Selecting an entry shows its details.
-Breed origin and physical information shown after a prediction is supporting
-reference metadata only; it does not prove the image belongs to that breed.
-
-Train:
+The baseline uses MobileNetV3-Small transfer learning by default, with optional
+EfficientNet-B0 and ResNet18 choices. Training applies augmentation, class
+weighted loss, deterministic seeds, validation, checkpointing, metrics, and a
+confusion matrix.
 
 ```bash
+python scripts/prepare_dataset.py
 python scripts/train.py --data datasets/processed --output models --epochs 10
-```
-
-Evaluate and generate metrics plus a confusion matrix:
-
-```bash
 python scripts/evaluate.py --checkpoint models/best_model.pt --data datasets/processed --split test
+python scripts/export_model.py --checkpoint models/best_model.pt --output models/best_model.ts
 ```
 
-Export a CPU-friendly TorchScript model and its class-label mapping:
+The repository contains no real dataset or trained production checkpoint, so it
+does not claim accuracy, precision, recall, or F1 results. The pipeline has only
+been smoke-tested with tiny synthetic fixtures. Model scores are not presented
+as scientifically calibrated probabilities.
+
+See [docs/model.md](docs/model.md) for artifact and inference details.
+
+## Dataset
+
+Supply real images locally using this structure:
+
+```text
+datasets/raw/<animal_type>/<breed>/<animal_id>/<image>
+datasets/processed/{train,validation,test}/<animal_type>/<breed>/<image>.jpg
+```
+
+The animal ID is the split group, keeping views of one animal together where
+possible. Raw and processed datasets are ignored by Git. See
+[docs/dataset.md](docs/dataset.md) and [datasets/README.md](datasets/README.md).
+
+## Demo
+
+The TUI can be demonstrated with `python main.py` and a local dataset. No
+screenshots or model results are checked into this repository, so no fabricated
+demo evidence is presented here.
+
+## Limitations
+
+- Supported breeds depend on the classes represented in training data.
+- Image quality, blur, lighting, background, and viewpoint affect prediction.
+- Visually similar breeds can be difficult to distinguish.
+- Human verification remains important, especially for low-confidence scores.
+- The current implementation is an MVP.
+- The breed database is broader than any model-supported label mapping.
+
+## Future Work
+
+- More breeds and a larger, field-representative dataset
+- Animal detection before breed classification
+- Mobile deployment and offline inference
+- BPA API integration where appropriate and authorized
+- Model quantization for edge hardware
+- Improved confidence calibration
+
+## Development
 
 ```bash
-python scripts/export_model.py --checkpoint models/best_model.pt --output models/best_model.ts --format torchscript
+pytest -q
+python scripts/dataset_stats.py --raw datasets/raw --output datasets/processed
 ```
 
-Use `--format onnx` to export ONNX instead. Training writes `best.pt`,
-`last_model.pt`, `classes.json`, `history.json`, and confusion-matrix files.
-
-## Layout
-
-- `app/`: application package and CLI implementation
-- `tests/`: automated tests
-- `configs/`: future training and deployment configuration
-- `datasets/`: local dataset workspace
-- `models/`: model artifacts
-- `scripts/`: development and data utilities
-- `docs/`: project documentation
-
-## Dataset preparation
-
-Place source images under `datasets/raw/<animal_type>/<breed>/<animal_id>/`.
-The preparation script writes resized train, validation, and test images under
-`datasets/processed/` and generates a JSON and Markdown report. The animal ID
+See [docs/development.md](docs/development.md) for the workflow and test
+guidance.
 directory is used as the split group to prevent data leakage. See
 `datasets/README.md` for the complete layout and options.
 
