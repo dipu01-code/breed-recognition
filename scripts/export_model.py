@@ -35,6 +35,16 @@ def main() -> int:
         torch.onnx.export(model, example, args.output, input_names=["image"], output_names=["logits"], opset_version=17)
     labels_path = args.output.with_suffix(args.output.suffix + ".labels.json")
     labels_path.write_text(json.dumps(checkpoint["class_to_idx"], indent=2), encoding="utf-8")
+    args.output.parent.joinpath("classes.json").write_text(
+        json.dumps(checkpoint["class_to_idx"], indent=2), encoding="utf-8"
+    )
+    args.output.parent.joinpath("preprocessing.json").write_text(
+        json.dumps({
+            "image_size": checkpoint["image_size"],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+        }, indent=2), encoding="utf-8"
+    )
     print(f"Exported {args.format} model to {args.output}")
     return 0
 
