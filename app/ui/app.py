@@ -57,7 +57,8 @@ class BreedRecognizerApp(App[None]):
     sections = ("HOME", "PREDICT", "BREEDS", "HISTORY", "MODEL", "SETTINGS", "ABOUT")
     repository = BreedRepository()
     settings = Settings.from_project_root()
-    current_path = settings.project_root
+    dataset_root = settings.project_root / "datasets" / "raw"
+    current_path = dataset_root
     active_section = "HOME"
     active_panel = "menu"
     _predictor: Predictor | None = None
@@ -165,7 +166,8 @@ class BreedRecognizerApp(App[None]):
         directory_list = self.query_one("#directory-list", ListView)
         await directory_list.remove_children()
         self.directory_targets.clear()
-        parent = self.current_path.parent if self.current_path != self.current_path.parent else self.current_path
+        self.current_path.mkdir(parents=True, exist_ok=True)
+        parent = self.current_path.parent if self.current_path != self.dataset_root else self.dataset_root
         parent_id = "dir-parent"
         self.directory_targets[parent_id] = parent
         directory_list.append(ListItem(Label(".."), id=parent_id))
@@ -188,12 +190,16 @@ class BreedRecognizerApp(App[None]):
         except OSError:
             files = []
         if not files:
-            file_list.append(ListItem(Label("No supported images"), id="file-empty"))
+            file_list.append(ListItem(Label("No supported images in this folder"), id="file-empty"))
         for index, image in enumerate(files):
             file_id = f"file-{index}"
             self.file_targets[file_id] = image
             file_list.append(ListItem(Label(image.name), id=file_id))
-        self.query_one("#preview", Static).update(f"{self.current_path}\n\nSelect an image to inspect it.")
+        self.query_one("#preview", Static).update(
+            f"{self.current_path}\n\nSelect an image to inspect it.\n\n"
+            "Expected layout:\n"
+            "raw/<animal_type>/<breed>/<animal_id>/<image>"
+        )
 
     def show_preview(self, image_path: Path) -> None:
         try:
