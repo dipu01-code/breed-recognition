@@ -211,7 +211,10 @@ class BreedRecognizerApp(App[None]):
     def run_prediction(self, image_path: Path) -> None:
         try:
             if self._predictor is None:
-                self._predictor = Predictor(self.settings.model_dir)
+                self._predictor = Predictor(
+                    self.settings.model_dir,
+                    confidence_threshold=self.settings.confidence_threshold,
+                )
             result = self._predictor.predict(image_path, top_k=3)
             self.history.insert(0, {"image": image_path.name, "result": result})
             self.show_prediction(result, image_path.name)
@@ -220,7 +223,18 @@ class BreedRecognizerApp(App[None]):
             self.query_one("#prediction", Static).update(f"PREDICTION UNAVAILABLE\n\n{error}")
 
     def show_prediction(self, result: dict[str, Any], filename: str) -> None:
-        lines = [f"Image: {filename}", f"Animal: {result['animal_type'].title()}", f"Breed: {result['predicted_breed']}", f"Confidence: {result['confidence']:.1%}", "", "TOP PREDICTIONS"]
+        status = result["confidence_status"]
+        lines = [
+            f"Image: {filename}",
+            f"Animal: {result['animal_type'].title()}",
+            f"Breed: {result['predicted_breed']}",
+            f"Confidence score: {result['confidence']:.1%}",
+            f"Threshold: {result['confidence_threshold']:.1%}",
+            f"Status: {'✓ HIGH CONFIDENCE' if status == 'HIGH' else '⚠ LOW CONFIDENCE'}",
+        ]
+        if result["manual_verification_recommended"]:
+            lines.append("Manual verification recommended.")
+        lines.extend(["", "TOP PREDICTIONS"])
         for item in result["top_predictions"]:
             bar = "█" * max(1, int(item["confidence"] * 24)) + "░" * max(0, 24 - int(item["confidence"] * 24))
             lines.append(f"{item['breed']:<16} {bar} {item['confidence']:.1%}")
@@ -253,7 +267,7 @@ class BreedRecognizerApp(App[None]):
         self.query_one("#screen-body", Static).update(f"Model: {'installed' if model.exists() else 'not installed'}\nLabels: {'available' if labels.exists() else 'not available'}\n\nNo performance claims are shown without real evaluation data.")
 
     def _settings_text(self) -> str:
-        return f"Project root: {self.settings.project_root}\nModel directory: {self.settings.model_dir}\nCurrent file directory: {self.current_path}\nSupported images: JPG, JPEG, PNG, WEBP"
+        return f"Project root: {self.settings.project_root}\nModel directory: {self.settings.model_dir}\nCurrent file directory: {self.current_path}\nConfidence threshold: {self.settings.confidence_threshold:.1%}\nOverride with BREED_CONFIDENCE_THRESHOLD.\nSupported images: JPG, JPEG, PNG, WEBP"
 
     async def action_refresh(self) -> None:
         if self.active_section == "PREDICT":

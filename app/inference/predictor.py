@@ -32,6 +32,10 @@ class PredictionResult:
     predicted_breed: str
     confidence: float
     top_predictions: tuple[TopPrediction, ...]
+    confidence_threshold: float
+    confidence_status: str
+    manual_verification_recommended: bool
+    confidence_note: str
     is_mock: bool = False
 
     def as_dict(self) -> dict[str, Any]:
@@ -73,9 +77,12 @@ def _load_preprocessing(config_path: Path) -> tuple[int, tuple[float, ...], tupl
 class Predictor:
     """Load an exported model once and return ranked, structured predictions."""
 
-    def __init__(self, model_dir: Path, mock: bool = False) -> None:
+    def __init__(self, model_dir: Path, mock: bool = False, confidence_threshold: float = 0.70) -> None:
+        if not 0 <= confidence_threshold <= 1:
+            raise ValueError("confidence_threshold must be between 0 and 1")
         self.model_dir = Path(model_dir)
         self.mock = mock
+        self.confidence_threshold = confidence_threshold
         self._model: ModelLike | None = None
         self._labels: dict[int, str] = {}
         self._image_size = 224
@@ -126,7 +133,10 @@ class Predictor:
             raise ValueError("top_k must be positive")
         inputs = self._preprocess(path)
         if self.mock:
-            return PredictionResult("unknown", "mock-unavailable", 0.0, (), is_mock=True).as_dict()
+            return PredictionResult(
+                "unknown", "mock-unavailable", 0.0, (), self.confidence_threshold,
+                "MOCK", True, "Development mock output; not a model prediction.", True,
+            ).as_dict()
         if self._model is None:
             raise InferenceError("Model is not loaded.")
         with torch.no_grad():
@@ -139,7 +149,17 @@ class Predictor:
         top = predictions[0]
         buffaloes = {"Murrah", "Jaffarabadi", "Surti", "Mehsana", "Nili-Ravi", "Bhadawari", "Pandharpuri", "Toda"}
         animal_type = "buffalo" if top.breed in buffaloes else "cattle"
-        return PredictionResult(animal_type, top.breed, top.confidence, predictions).as_dict()
+        is_high_confidence = top.confidence >= self.confidence_threshold
+        return PredictionResult(
+            animal_type,
+            top.breed,
+            top.confidence,
+            predictions,
+            self.confidence_threshold,
+            "HIGH" if is_high_confidence else "LOW",
+            not is_high_confidence,
+            "Model score; not a scientifically calibrated probability.",
+        ).as_dict()
 
 
 def load_model(model_dir: Path):

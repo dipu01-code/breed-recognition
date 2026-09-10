@@ -67,6 +67,12 @@ No real training accuracy is included in this repository because the actual
 dataset is not committed. The pipeline was smoke-tested with a tiny synthetic
 dataset only; those metrics must not be interpreted as breed-model performance.
 
+Predictions use a configurable confidence threshold of `70%` by default. Set
+`BREED_CONFIDENCE_THRESHOLD` to a value between `0` and `1` to change it. The
+displayed score is a model score, not a scientifically calibrated probability;
+scores below the threshold are marked low-confidence and recommend manual
+verification.
+
 Train:
 
 ```bash

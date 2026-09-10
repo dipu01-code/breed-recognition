@@ -78,3 +78,21 @@ def test_predictor_rejects_invalid_preprocessing_configuration(tmp_path: Path):
 
     with pytest.raises(InferenceError, match="Invalid preprocessing configuration"):
         Predictor(model_dir)
+
+
+def test_predictor_marks_low_confidence_and_recommends_verification(tmp_path: Path):
+    model_dir = tmp_path / "model"
+    image = tmp_path / "cow.jpg"
+    write_model(model_dir)
+    write_image(image)
+
+    result = Predictor(model_dir, confidence_threshold=0.95).predict(image)
+
+    assert result["confidence_status"] == "LOW"
+    assert result["manual_verification_recommended"] is True
+    assert "not a scientifically calibrated probability" in result["confidence_note"]
+
+
+def test_predictor_rejects_invalid_confidence_threshold(tmp_path: Path):
+    with pytest.raises(ValueError, match="between 0 and 1"):
+        Predictor(tmp_path, confidence_threshold=1.1)
