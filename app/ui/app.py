@@ -1,49 +1,94 @@
-"""Professional terminal interface for the breed recognizer."""
+"""Professional terminal workspace for the breed recognizer."""
 
+from __future__ import annotations
+
+import os
+from pathlib import Path
+from typing import Any
+
+from PIL import Image, UnidentifiedImageError
 from textual.app import App, ComposeResult
 from textual.containers import Container, Horizontal, Vertical
 from textual.widgets import DataTable, Footer, Header, Input, Label, ListItem, ListView, Static
 
+from app.config.settings import Settings
+from app.core.breeds import Breed
 from app.data.breed_repository import BreedRepository
+from app.inference.predictor import InferenceError, Predictor, SUPPORTED_IMAGE_EXTENSIONS
 
 
 class BreedRecognizerApp(App[None]):
-    """Full-screen keyboard-navigable application shell."""
+    """Keyboard-first full-screen terminal application."""
 
     CSS = """
     Screen { background: #101820; color: #e7edf2; }
     Header { background: #17324d; color: #f4c95d; }
     Footer { background: #0a1118; }
     #layout { height: 1fr; }
-    #navigation { width: 24; background: #142637; border: round #2b5878; padding: 1; }
-    #content { width: 1fr; border: round #2b5878; padding: 2; }
+    #navigation { width: 23; background: #142637; border-right: solid #2b5878; padding: 1; }
+    #content { width: 1fr; padding: 1 2; }
     #title { color: #f4c95d; text-style: bold; margin-bottom: 1; }
+    #screen-title { color: #f4c95d; text-style: bold; height: 2; }
+    #screen-body { color: #b9c8d3; height: auto; margin-bottom: 1; }
     #status { dock: bottom; height: 1; background: #17324d; color: #b9c8d3; padding: 0 1; }
-    #breed-search { margin: 1 0; display: none; }
-    #breed-detail { margin-top: 1; border: round #2b5878; padding: 1; display: none; }
     ListItem { padding: 1; }
     ListItem.--highlight { background: #2b5878; color: #ffffff; }
-    DataTable { height: 1fr; }
-    .muted { color: #9db0bd; }
+    DataTable { height: 1fr; border: round #2b5878; }
+    Input { border: round #2b5878; margin-bottom: 1; }
+    #file-selector { height: 1fr; }
+    .panel { border: round #2b5878; padding: 1; width: 1fr; }
+    .panel-title { color: #f4c95d; text-style: bold; height: 1; }
+    #directory-list, #file-list { height: 1fr; }
+    #preview { height: 1fr; color: #b9c8d3; }
+    #breed-detail, #prediction, #settings, #about { border: round #2b5878; padding: 1; height: auto; margin-top: 1; }
+    .hidden { display: none; }
     """
 
-    BINDINGS = [("q", "quit", "Quit"), ("escape", "back", "Back"), ("?", "help", "Help")]
-    sections = ("HOME", "PREDICT", "BREEDS", "HISTORY", "MODEL", "ABOUT")
+    BINDINGS = [
+        ("q", "quit", "Quit"),
+        ("escape", "back", "Back"),
+        ("?", "help", "Help"),
+        ("r", "refresh", "Refresh"),
+        ("left", "focus_menu", "Menu"),
+        ("right", "focus_files", "Files"),
+    ]
+    sections = ("HOME", "PREDICT", "BREEDS", "HISTORY", "MODEL", "SETTINGS", "ABOUT")
     repository = BreedRepository()
+    settings = Settings.from_project_root()
+    current_path = settings.project_root
+    active_section = "HOME"
+    active_panel = "menu"
+    _predictor: Predictor | None = None
+    history: list[dict[str, Any]] = []
+    directory_targets: dict[str, Path] = {}
+    file_targets: dict[str, Path] = {}
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
         with Horizontal(id="layout"):
             with Vertical(id="navigation"):
-                yield Label("INDIAN BREED\nRECOGNIZER", id="title")
-                yield ListView(*(ListItem(Label(section), id=section.lower()) for section in self.sections), id="menu")
+                yield Label("INDIAN BREED\nAI", id="title")
+                yield ListView(*(ListItem(Label(section), id=f"menu-{section.lower()}") for section in self.sections), id="menu")
             with Container(id="content"):
                 yield Static(id="screen-title")
                 yield Static(id="screen-body")
-                yield Input(placeholder="Search breed name or alias...", id="breed-search")
-                yield DataTable(id="breed-table")
-                yield Static(id="breed-detail")
-        yield Static("Ready | Up/Down navigate  Enter select  Esc back  ? help  Q quit", id="status")
+                yield Input(placeholder="Search breed name or alias...", id="breed-search", classes="hidden")
+                yield DataTable(id="breed-table", classes="hidden")
+                yield Static(id="breed-detail", classes="hidden")
+                with Horizontal(id="file-selector", classes="hidden"):
+                    with Vertical(classes="panel"):
+                        yield Static("DIRECTORIES", classes="panel-title")
+                        yield ListView(id="directory-list")
+                    with Vertical(classes="panel"):
+                        yield Static("FILES", classes="panel-title")
+                        yield ListView(id="file-list")
+                    with Vertical(classes="panel"):
+                        yield Static("PREVIEW", classes="panel-title")
+                        yield Static(id="preview")
+                yield Static(id="prediction", classes="hidden")
+                yield Static(id="settings", classes="hidden")
+                yield Static(id="about", classes="hidden")
+        yield Static("Up/Down Navigate   Left/Right Panels   Enter Select   Esc Back   R Refresh   ? Help   Q Quit", id="status")
         yield Footer()
 
     def on_mount(self) -> None:
@@ -51,42 +96,136 @@ class BreedRecognizerApp(App[None]):
         self.show_section("HOME")
 
     def on_list_view_selected(self, event: ListView.Selected) -> None:
-        self.show_section(event.item.id.upper())
+        item_id = event.item.id or ""
+        if item_id.startswith("menu-"):
+            self.show_section(item_id.removeprefix("menu-").upper())
+        elif item_id.startswith("dir-"):
+            self.current_path = self.directory_targets[item_id]
+            self.populate_files()
+        elif item_id.startswith("file-"):
+            self.show_preview(self.file_targets[item_id])
 
     def on_input_changed(self, event: Input.Changed) -> None:
         if event.input.id == "breed-search":
             self.populate_breeds(event.value)
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
-        breed = event.data_table.get_row(event.row_key)
-        detail = self.repository.get_breed(str(breed[1]))
-        self.query_one("#breed-detail", Static).update(
-            f"{detail.breed_name} ({detail.animal_type})\n"
-            f"Origin: {detail.origin_region}\n"
-            f"Purpose: {', '.join(detail.purpose)}\n"
-            f"Color: {detail.color}\n"
-            f"Horns: {detail.horn_characteristics}\n"
-            f"Notes: {detail.identification_notes}\n"
-            "\nDatabase record only; model support is tracked separately."
-        )
+        row = event.data_table.get_row(event.row_key)
+        breed = self.repository.get_breed(str(row[1]))
+        self.show_breed_detail(breed)
 
     def show_section(self, section: str) -> None:
+        self.active_section = section
+        self.active_panel = "menu"
+        menu = self.query_one("#menu", ListView)
+        if section == "HOME":
+            menu.index = 0
+        menu.focus()
         self.query_one("#screen-title", Static).update(section)
-        body = {
-            "HOME": "Breed recognition workspace\n\nSelect a section to begin.",
-            "PREDICT": "Prediction is unavailable until a trained model is installed.\nNo prediction is fabricated.",
-            "BREEDS": "Browse the Indian cattle and buffalo breed reference database.",
-            "HISTORY": "No prediction history is available yet.",
-            "MODEL": "Model status: baseline model not installed.\nTraining and export are available through the project scripts.",
-            "ABOUT": "Indian Breed Recognizer\nA research-oriented tool for Indian cattle and buffalo breed recognition.",
-        }[section]
-        self.query_one("#screen-body", Static).update(body)
-        search = self.query_one("#breed-search", Input)
-        detail = self.query_one("#breed-detail", Static)
-        search.display = section == "BREEDS"
-        detail.display = section == "BREEDS"
-        if section == "BREEDS":
+        self._hide_content_widgets()
+        if section == "HOME":
+            self.query_one("#screen-body", Static).update("Breed recognition workspace\n\nSelect a section to begin.")
+        elif section == "PREDICT":
+            self.query_one("#screen-body", Static).update("Select an image. The real inference service will be called when you press Enter.")
+            self.query_one("#file-selector").remove_class("hidden")
+            self.populate_files()
+        elif section == "BREEDS":
+            self.query_one("#screen-body", Static).update("Database reference. Model-supported breeds are tracked separately.")
+            self.query_one("#breed-search").remove_class("hidden")
+            self.query_one("#breed-table").remove_class("hidden")
+            self.query_one("#breed-detail").remove_class("hidden")
             self.populate_breeds()
+        elif section == "HISTORY":
+            self.show_history()
+        elif section == "MODEL":
+            self.show_model()
+        elif section == "SETTINGS":
+            self.query_one("#settings", Static).remove_class("hidden")
+            self.query_one("#settings", Static).update(self._settings_text())
+        elif section == "ABOUT":
+            self.query_one("#about", Static).remove_class("hidden")
+            self.query_one("#about", Static).update("Indian Breed AI\n\nA terminal-first research tool for Indian cattle and buffalo breed recognition.\n\nPredictions are only shown when a trained model is available.")
+
+    def _hide_content_widgets(self) -> None:
+        for widget_id in ("#breed-search", "#breed-table", "#breed-detail", "#file-selector", "#prediction", "#settings", "#about"):
+            self.query_one(widget_id).add_class("hidden")
+        self.query_one("#screen-body", Static).update("")
+
+    def populate_directories(self) -> None:
+        directory_list = self.query_one("#directory-list", ListView)
+        directory_list.clear()
+        self.directory_targets.clear()
+        parent = self.current_path.parent if self.current_path != self.current_path.parent else self.current_path
+        parent_id = "dir-parent"
+        self.directory_targets[parent_id] = parent
+        directory_list.append(ListItem(Label(".."), id=parent_id))
+        try:
+            directories = sorted(path for path in self.current_path.iterdir() if path.is_dir() and not path.name.startswith("."))
+        except OSError:
+            directories = []
+        for index, directory in enumerate(directories):
+            directory_id = f"dir-{index}"
+            self.directory_targets[directory_id] = directory
+            directory_list.append(ListItem(Label(f"[DIR] {directory.name}"), id=directory_id))
+
+    def populate_files(self) -> None:
+        self.populate_directories()
+        file_list = self.query_one("#file-list", ListView)
+        file_list.clear()
+        self.file_targets.clear()
+        try:
+            files = sorted(path for path in self.current_path.iterdir() if path.is_file() and path.suffix.lower() in SUPPORTED_IMAGE_EXTENSIONS)
+        except OSError:
+            files = []
+        if not files:
+            file_list.append(ListItem(Label("No supported images"), id="file-empty"))
+        for index, image in enumerate(files):
+            file_id = f"file-{index}"
+            self.file_targets[file_id] = image
+            file_list.append(ListItem(Label(image.name), id=file_id))
+        self.query_one("#preview", Static).update(f"{self.current_path}\n\nSelect an image to inspect it.")
+
+    def show_preview(self, image_path: Path) -> None:
+        try:
+            with Image.open(image_path) as image:
+                width, height = image.size
+                image_format = image.format or "unknown"
+            self.query_one("#preview", Static).update(
+                f"{image_path.name}\n\nFormat: {image_format}\nDimensions: {width} x {height}\nSize: {image_path.stat().st_size:,} bytes\n\nTerminal image rendering is unavailable; metadata preview shown."
+            )
+        except (OSError, UnidentifiedImageError) as error:
+            self.query_one("#preview", Static).update(f"Unable to preview {image_path.name}: {error}")
+
+    def on_key(self, event) -> None:
+        if event.key == "enter" and self.active_section == "PREDICT" and self.active_panel == "files":
+            files = self.query_one("#file-list", ListView)
+            if files.highlighted_child and (files.highlighted_child.id or "").startswith("file-"):
+                self.run_prediction(self.file_targets[files.highlighted_child.id])
+        elif event.key == "right" and self.active_section == "PREDICT":
+            self.active_panel = "files"
+            self.query_one("#file-list", ListView).focus()
+        elif event.key == "left" and self.active_section == "PREDICT":
+            self.active_panel = "directories"
+            self.query_one("#directory-list", ListView).focus()
+
+    def run_prediction(self, image_path: Path) -> None:
+        try:
+            if self._predictor is None:
+                self._predictor = Predictor(self.settings.model_dir)
+            result = self._predictor.predict(image_path, top_k=3)
+            self.history.insert(0, {"image": image_path.name, "result": result})
+            self.show_prediction(result, image_path.name)
+        except InferenceError as error:
+            self.query_one("#prediction", Static).remove_class("hidden")
+            self.query_one("#prediction", Static).update(f"PREDICTION UNAVAILABLE\n\n{error}")
+
+    def show_prediction(self, result: dict[str, Any], filename: str) -> None:
+        lines = [f"Image: {filename}", f"Animal: {result['animal_type'].title()}", f"Breed: {result['predicted_breed']}", f"Confidence: {result['confidence']:.1%}", "", "TOP PREDICTIONS"]
+        for item in result["top_predictions"]:
+            bar = "█" * max(1, int(item["confidence"] * 24)) + "░" * max(0, 24 - int(item["confidence"] * 24))
+            lines.append(f"{item['breed']:<16} {bar} {item['confidence']:.1%}")
+        self.query_one("#prediction", Static).remove_class("hidden")
+        self.query_one("#prediction", Static).update("\n".join(lines))
 
     def populate_breeds(self, query: str = "") -> None:
         table = self.query_one("#breed-table", DataTable)
@@ -96,8 +235,43 @@ class BreedRecognizerApp(App[None]):
         for breed in breeds:
             table.add_row(breed.animal_type, breed.breed_name, breed.confidence)
 
+    def show_breed_detail(self, breed: Breed) -> None:
+        self.query_one("#breed-detail", Static).update(
+            f"{breed.breed_name} ({breed.animal_type})\nOrigin: {breed.origin_region}\nPurpose: {', '.join(breed.purpose)}\nColor: {breed.color}\nHorns: {breed.horn_characteristics}\nNotes: {breed.identification_notes}"
+        )
+
+    def show_history(self) -> None:
+        if not self.history:
+            text = "No prediction history is available yet."
+        else:
+            text = "\n".join(f"{entry['image']}: {entry['result'].get('predicted_breed', 'unavailable')}" for entry in self.history)
+        self.query_one("#screen-body", Static).update(text)
+
+    def show_model(self) -> None:
+        model = self.settings.model_dir / "best_model.ts"
+        labels = self.settings.model_dir / "classes.json"
+        self.query_one("#screen-body", Static).update(f"Model: {'installed' if model.exists() else 'not installed'}\nLabels: {'available' if labels.exists() else 'not available'}\n\nNo performance claims are shown without real evaluation data.")
+
+    def _settings_text(self) -> str:
+        return f"Project root: {self.settings.project_root}\nModel directory: {self.settings.model_dir}\nCurrent file directory: {self.current_path}\nSupported images: JPG, JPEG, PNG, WEBP"
+
+    def action_refresh(self) -> None:
+        if self.active_section == "PREDICT":
+            self.populate_files()
+        elif self.active_section == "BREEDS":
+            self.populate_breeds()
+
     def action_back(self) -> None:
         self.show_section("HOME")
 
+    def action_focus_menu(self) -> None:
+        self.active_panel = "menu"
+        self.query_one("#menu", ListView).focus()
+
+    def action_focus_files(self) -> None:
+        if self.active_section == "PREDICT":
+            self.active_panel = "files"
+            self.query_one("#file-list", ListView).focus()
+
     def action_help(self) -> None:
-        self.query_one("#screen-body", Static).update("Keyboard navigation\n\nUp/Down: navigate\nEnter: select\nEsc: home\nQ: quit")
+        self.query_one("#screen-body", Static).update("Keys\n\nUp/Down  Navigate\nLeft/Right  Switch panels\nEnter  Select / predict\nEsc  Home\nR  Refresh\nQ  Quit")
