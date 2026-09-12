@@ -1,21 +1,3 @@
-# Indian Breed Recognizer
-
-CLI and knowledge database for image-based breed recognition of Indian cattle
-and buffaloes. The breed metadata is a research-oriented reference and is not
-itself an ML classifier label list.
-
-## Installation
-
-Use Python 3.10 or newer. A virtual environment is recommended:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-python -m pip install pytest
-```
-
-The CLI has no runtime dependencies at this stage.
 # Indian Breed AI
 
 Indian Breed AI is a terminal-first MVP for exploring Indian cattle and buffalo
@@ -179,11 +161,3 @@ guidance.
 directory is used as the split group to prevent data leakage. See
 `datasets/README.md` for the complete layout and options.
 
-## Starting the terminal application
-
-From the repository root, activate the environment and run:
-
-```bash
-source .venv/bin/activate
-python main.py --help
-```
