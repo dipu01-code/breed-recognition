@@ -57,7 +57,7 @@ class BreedRecognizerApp(App[None]):
     sections = ("HOME", "PREDICT", "BREEDS", "HISTORY", "MODEL", "SETTINGS", "ABOUT")
     repository = BreedRepository()
     settings = Settings.from_project_root()
-    dataset_root = settings.project_root / "datasets" / "raw"
+    dataset_root = settings.project_root
     current_path = dataset_root
     active_section = "HOME"
     active_panel = "menu"
@@ -111,7 +111,9 @@ class BreedRecognizerApp(App[None]):
             self.current_path = self.directory_targets[item_id]
             await self.populate_files()
         elif item_id.startswith("file-"):
-            self.show_preview(self.file_targets[item_id])
+            image_path = self.file_targets[item_id]
+            self.show_preview(image_path)
+            self.run_prediction(image_path)
 
     def on_input_changed(self, event: Input.Changed) -> None:
         if event.input.id == "breed-search":
@@ -137,7 +139,7 @@ class BreedRecognizerApp(App[None]):
         if section == "HOME":
             self.query_one("#screen-body", Static).update("Breed recognition workspace\n\nSelect a section to begin.")
         elif section == "PREDICT":
-            self.query_one("#screen-body", Static).update("Select an image. The real inference service will be called when you press Enter.")
+            self.query_one("#screen-body", Static).update("Select an image to preview it and run prediction.")
             self.query_one("#file-selector").remove_class("hidden")
             await self.populate_files()
         elif section == "BREEDS":
@@ -186,19 +188,21 @@ class BreedRecognizerApp(App[None]):
         await file_list.remove_children()
         self.file_targets.clear()
         try:
-            files = sorted(path for path in self.current_path.iterdir() if path.is_file() and path.suffix.lower() in SUPPORTED_IMAGE_EXTENSIONS)
+            files = sorted(
+                path for path in self.current_path.rglob("*")
+                if path.is_file() and path.suffix.lower() in SUPPORTED_IMAGE_EXTENSIONS
+            )
         except OSError:
             files = []
         if not files:
-            file_list.append(ListItem(Label("No supported images in this folder"), id="file-empty"))
+            file_list.append(ListItem(Label("No supported images found"), id="file-empty"))
         for index, image in enumerate(files):
             file_id = f"file-{index}"
             self.file_targets[file_id] = image
-            file_list.append(ListItem(Label(image.name), id=file_id))
+            relative_path = image.relative_to(self.current_path)
+            file_list.append(ListItem(Label(str(relative_path)), id=file_id))
         self.query_one("#preview", Static).update(
-            f"{self.current_path}\n\nSelect an image to inspect it.\n\n"
-            "Expected layout:\n"
-            "raw/<animal_type>/<breed>/<animal_id>/<image>"
+            f"{self.current_path}\n\nSelect an image to inspect it and run prediction."
         )
 
     def show_preview(self, image_path: Path) -> None:
