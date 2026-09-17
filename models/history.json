@@ -1,0 +1,272 @@
+[
+  {
+    "epoch": 1,
+    "train": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    },
+    "validation": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    }
+  },
+  {
+    "epoch": 2,
+    "train": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    },
+    "validation": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    }
+  },
+  {
+    "epoch": 3,
+    "train": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    },
+    "validation": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    }
+  },
+  {
+    "epoch": 4,
+    "train": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    },
+    "validation": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    }
+  },
+  {
+    "epoch": 5,
+    "train": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    },
+    "validation": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    }
+  },
+  {
+    "epoch": 6,
+    "train": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    },
+    "validation": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    }
+  },
+  {
+    "epoch": 7,
+    "train": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    },
+    "validation": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    }
+  },
+  {
+    "epoch": 8,
+    "train": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    },
+    "validation": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    }
+  },
+  {
+    "epoch": 9,
+    "train": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    },
+    "validation": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    }
+  },
+  {
+    "epoch": 10,
+    "train": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    },
+    "validation": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "confusion_matrix": [
+        [
+          1
+        ]
+      ],
+      "loss": 0.0
+    }
+  }
+]
