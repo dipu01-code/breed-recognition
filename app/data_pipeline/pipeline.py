@@ -150,8 +150,9 @@ class DatasetPipeline:
         splits = self._split_records(records)
         for split, split_records in splits.items():
             for record in split_records:
+                # ImageFolder labels by the first folder level, so it must be the breed.
                 destination = (
-                    self.output_dir / split / record.animal_type / record.breed
+                    self.output_dir / split / record.breed
                     / f"{record.animal_id}_{record.source.stem}.jpg"
                 )
                 self._write_image(record, destination, augment=augment and split == "train")

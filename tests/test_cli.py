@@ -4,7 +4,17 @@ import json
 
 from pathlib import Path
 
+import pytest
+
 from app.cli.main import main
+from app.config.settings import Settings
+
+
+@pytest.fixture
+def empty_project(monkeypatch, tmp_path: Path):
+    """Run the CLI against an empty project so a locally trained model does not change results."""
+    monkeypatch.setattr(Settings, "from_project_root", classmethod(lambda cls, root=None: cls(tmp_path, tmp_path / "models")))
+    return tmp_path
 
 
 def test_help(capsys):
@@ -60,12 +70,12 @@ def test_unknown_breed_is_an_application_error(caplog):
     assert "Unknown breed" in caplog.text
 
 
-def test_info(capsys):
+def test_info(capsys, empty_project):
     assert main(["info"]) == 0
     assert "inference: unavailable" in capsys.readouterr().out
 
 
-def test_predict_without_model(caplog, tmp_path: Path):
+def test_predict_without_model(caplog, tmp_path: Path, empty_project):
     image = tmp_path / "animal.jpg"
     image.write_bytes(b"placeholder")
     assert main(["predict", str(image)]) == 2
@@ -82,3 +92,9 @@ def test_breed_repository_supports_phase_two_queries():
     assert [breed.breed_name for breed in repository.search("murrah")] == ["Murrah"]
     assert not MODEL_SUPPORTED_BREEDS
     assert not repository.is_model_supported("Gir")
+
+
+def test_invalid_threshold_is_a_clean_error(monkeypatch, caplog):
+    monkeypatch.setenv("BREED_CONFIDENCE_THRESHOLD", "high")
+    assert main(["info"]) == 2
+    assert "BREED_CONFIDENCE_THRESHOLD" in caplog.text

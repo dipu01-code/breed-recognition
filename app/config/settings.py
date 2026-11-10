@@ -4,6 +4,8 @@ from dataclasses import dataclass
 import os
 from pathlib import Path
 
+from app.core.errors import ApplicationError
+
 
 @dataclass(frozen=True)
 class Settings:
@@ -21,7 +23,7 @@ class Settings:
         try:
             confidence_threshold = float(raw_threshold)
         except ValueError as error:
-            raise ValueError("BREED_CONFIDENCE_THRESHOLD must be a number between 0 and 1") from error
+            raise ApplicationError("BREED_CONFIDENCE_THRESHOLD must be a number between 0 and 1") from error
         if not 0 <= confidence_threshold <= 1:
-            raise ValueError("BREED_CONFIDENCE_THRESHOLD must be between 0 and 1")
+            raise ApplicationError("BREED_CONFIDENCE_THRESHOLD must be between 0 and 1")
         return cls(project_root=root, model_dir=root / "models", confidence_threshold=confidence_threshold)

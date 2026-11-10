@@ -39,7 +39,11 @@ class HistoryStore:
             "confidence": confidence,
             "model_version": model_version,
         }
-        records = [record, *self.load()]
+        existing = self.load()
+        if not existing and self.path.exists() and self.path.read_text(encoding="utf-8").strip() not in ("", "[]"):
+            # Keep unreadable history aside instead of overwriting it.
+            self.path.replace(self.path.with_suffix(".corrupt.json"))
+        records = [record, *existing]
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.path.write_text(json.dumps(records, indent=2), encoding="utf-8")
         return record

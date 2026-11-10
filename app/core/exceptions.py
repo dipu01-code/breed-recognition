@@ -1,5 +1,5 @@
 """Domain-specific application errors."""
 
+from app.core.errors import ApplicationError
 
-class ApplicationError(Exception):
-    """Base application error."""
+__all__ = ["ApplicationError"]

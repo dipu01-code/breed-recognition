@@ -118,7 +118,7 @@ Supply real images locally using this structure:
 
 ```text
 datasets/raw/<animal_type>/<breed>/<animal_id>/<image>
-datasets/processed/{train,validation,test}/<animal_type>/<breed>/<image>.jpg
+datasets/processed/{train,validation,test}/<breed>/<image>.jpg
 ```
 
 The animal ID is the split group, keeping views of one animal together where

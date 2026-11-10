@@ -56,17 +56,20 @@ class BreedRecognizerApp(App[None]):
     ]
     sections = ("HOME", "PREDICT", "BREEDS", "HISTORY", "MODEL", "SETTINGS", "ABOUT")
     repository = BreedRepository()
-    settings = Settings.from_project_root()
-    dataset_root = settings.project_root
-    current_path = dataset_root
-    active_section = "HOME"
-    active_panel = "menu"
-    _predictor: Predictor | None = None
-    history: list[dict[str, Any]] = []
-    history_store = HistoryStore(Settings.from_project_root().project_root / "prediction_history.json")
-    history_targets: dict[str, dict[str, Any]] = {}
-    directory_targets: dict[str, Path] = {}
-    file_targets: dict[str, Path] = {}
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.settings = Settings.from_project_root()
+        self.dataset_root = self.settings.project_root
+        self.current_path = self.dataset_root
+        self.active_section = "HOME"
+        self.active_panel = "menu"
+        self._predictor: Predictor | None = None
+        self.history: list[dict[str, Any]] = []
+        self.history_store = HistoryStore(self.settings.project_root / "prediction_history.json")
+        self.history_targets: dict[str, dict[str, Any]] = {}
+        self.directory_targets: dict[str, Path] = {}
+        self.file_targets: dict[str, Path] = {}
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
@@ -191,11 +194,12 @@ class BreedRecognizerApp(App[None]):
             files = sorted(
                 path for path in self.current_path.rglob("*")
                 if path.is_file() and path.suffix.lower() in SUPPORTED_IMAGE_EXTENSIONS
+                and not any(part.startswith(".") for part in path.relative_to(self.current_path).parts)
             )
         except OSError:
             files = []
         if not files:
-            file_list.append(ListItem(Label("No supported images found"), id="file-empty"))
+            file_list.append(ListItem(Label("No supported images found"), id="no-files"))
         for index, image in enumerate(files):
             file_id = f"file-{index}"
             self.file_targets[file_id] = image
@@ -215,18 +219,6 @@ class BreedRecognizerApp(App[None]):
             )
         except (OSError, UnidentifiedImageError) as error:
             self.query_one("#preview", Static).update(f"Unable to preview {image_path.name}: {error}")
-
-    def on_key(self, event) -> None:
-        if event.key == "enter" and self.active_section == "PREDICT" and self.active_panel == "files":
-            files = self.query_one("#file-list", ListView)
-            if files.highlighted_child and (files.highlighted_child.id or "").startswith("file-"):
-                self.run_prediction(self.file_targets[files.highlighted_child.id])
-        elif event.key == "right" and self.active_section == "PREDICT":
-            self.active_panel = "files"
-            self.query_one("#file-list", ListView).focus()
-        elif event.key == "left" and self.active_section == "PREDICT":
-            self.active_panel = "directories"
-            self.query_one("#directory-list", ListView).focus()
 
     def run_prediction(self, image_path: Path) -> None:
         try:
@@ -341,6 +333,11 @@ class BreedRecognizerApp(App[None]):
         await self.show_section("HOME")
 
     def action_focus_menu(self) -> None:
+        # In PREDICT, Left steps back one panel: files -> directories -> menu.
+        if self.active_section == "PREDICT" and self.active_panel == "files":
+            self.active_panel = "directories"
+            self.query_one("#directory-list", ListView).focus()
+            return
         self.active_panel = "menu"
         self.query_one("#menu", ListView).focus()
 

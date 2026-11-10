@@ -11,6 +11,7 @@ import torch
 from PIL import Image, UnidentifiedImageError
 from torchvision import transforms
 
+from app.core.breeds import get_breed
 from app.core.errors import ApplicationError
 
 SUPPORTED_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".webp", ".tif", ".tiff"}
@@ -155,8 +156,10 @@ class Predictor:
         values, indexes = torch.topk(probabilities, k=min(top_k, len(self._labels)))
         predictions = tuple(TopPrediction(self._labels[int(index)], float(value)) for value, index in zip(values, indexes))
         top = predictions[0]
-        buffaloes = {"Murrah", "Jaffarabadi", "Surti", "Mehsana", "Nili-Ravi", "Bhadawari", "Pandharpuri", "Toda"}
-        animal_type = "buffalo" if top.breed in buffaloes else "cattle"
+        try:
+            animal_type = get_breed(top.breed).animal_type
+        except ApplicationError:
+            animal_type = "unknown"
         is_high_confidence = top.confidence >= self.confidence_threshold
         return PredictionResult(
             animal_type,

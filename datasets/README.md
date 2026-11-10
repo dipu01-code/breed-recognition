@@ -8,9 +8,9 @@ datasets/
     cattle/<breed>/<animal_id>/<image>
     buffalo/<breed>/<animal_id>/<image>
   processed/
-    train/<animal_type>/<breed>/<image>.jpg
-    validation/<animal_type>/<breed>/<image>.jpg
-    test/<animal_type>/<breed>/<image>.jpg
+    train/<breed>/<image>.jpg
+    validation/<breed>/<image>.jpg
+    test/<breed>/<image>.jpg
 ```
 
 Each animal must have a stable unique directory name. The pipeline uses that

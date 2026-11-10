@@ -57,7 +57,8 @@ def run(args: argparse.Namespace, settings: Settings) -> int:
         print(f"version: {__version__}")
         print(f"project_root: {settings.project_root}")
         print(f"model_dir: {settings.model_dir}")
-        print("inference: unavailable (model not installed)")
+        installed = (settings.model_dir / "best_model.ts").exists()
+        print(f"inference: {'available' if installed else 'unavailable (model not installed)'}")
         return 0
 
     if args.command == "predict":

@@ -53,6 +53,8 @@ def test_split_keeps_animal_images_together_and_resizes(tmp_path: Path):
             with Image.open(path) as image:
                 assert image.size == (24, 18)
     assert len(locations) == 12
+    # Training uses ImageFolder, which labels by the folder directly under each split.
+    assert {path.relative_to(output).parts[1] for path in output.rglob("*.jpg")} == {"gir"}
     assert sum(report.split_distribution.values()) == 24
 
 

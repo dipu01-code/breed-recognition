@@ -25,9 +25,9 @@ Use `--augment` for horizontal-flip copies in the training split only. Validatio
 
 ```text
 datasets/processed/
-  train/<animal_type>/<breed>/image.jpg
-  validation/<animal_type>/<breed>/image.jpg
-  test/<animal_type>/<breed>/image.jpg
+  train/<breed>/image.jpg
+  validation/<breed>/image.jpg
+  test/<breed>/image.jpg
 ```
 
 No dataset is present in the repository, and empty dataset runs must be treated as setup status rather than model evidence.

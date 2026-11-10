@@ -38,3 +38,55 @@ def test_ui_supports_resize_quit_and_history_screen():
     import asyncio
 
     asyncio.run(check())
+
+
+
+def test_enter_on_file_predicts_once_and_empty_folder_does_not_crash(tmp_path):
+    from PIL import Image
+
+    async def check(folder, expected_calls) -> None:
+        app = BreedRecognizerApp()
+        app.dataset_root = app.current_path = folder
+        calls = []
+        app.run_prediction = calls.append
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.press("down", "enter", "right", "down", "enter")
+            await pilot.pause()
+        assert len(calls) == expected_calls
+
+    with_image = tmp_path / "images"
+    with_image.mkdir()
+    Image.new("RGB", (8, 8)).save(with_image / "cow.jpg")
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    asyncio.run(check(with_image, 1))
+    asyncio.run(check(empty, 0))
+
+
+def test_left_steps_back_through_panels_and_hidden_folders_are_skipped(tmp_path):
+    from PIL import Image
+
+    (tmp_path / ".venv").mkdir()
+    Image.new("RGB", (8, 8)).save(tmp_path / ".venv" / "icon.png")
+    Image.new("RGB", (8, 8)).save(tmp_path / "cow.jpg")
+
+    async def check() -> None:
+        app = BreedRecognizerApp()
+        app.dataset_root = app.current_path = tmp_path
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.press("down", "enter", "right")
+            assert [str(path.name) for path in app.file_targets.values()] == ["cow.jpg"]
+            await pilot.press("left")
+            assert app.focused.id == "directory-list"
+            await pilot.press("left")
+            assert app.focused.id == "menu"
+
+    asyncio.run(check())
+
+
+def test_invalid_threshold_shows_clean_error(monkeypatch, capsys):
+    from app.main import main
+
+    monkeypatch.setenv("BREED_CONFIDENCE_THRESHOLD", "abc")
+    assert main() == 2
+    assert "BREED_CONFIDENCE_THRESHOLD" in capsys.readouterr().err
